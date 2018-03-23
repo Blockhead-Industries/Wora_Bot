@@ -7,6 +7,8 @@ var connection = mysql.createConnection({
     database: 'wora'
 });
 
+// Most of this is atm vulnerable to SQL injection. Fix in future if I find time.
+
 connection.connect(function (err) {
     if (!err) {
         console.log("Database is connected");

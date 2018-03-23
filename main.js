@@ -11,7 +11,6 @@ const express = require('express')
 const request = require('request')
 const bodyParser = require('body-parser')
 
-
 let app = express()
 app.use(express.json());
 
@@ -51,21 +50,21 @@ function setuplink(target) {
     console.log("Setup for: " + target)
     var inbound = target.replace("https://discordapp.com/api/webhooks/", "")
     app.post("/" + inbound, function (req, res) {
-try{
-        console.log("DATA: " + req.body.username + " - " + req.body.content)
-        let data = req.body
-        request({
-            url: target,
-            method: "POST",
-            json: req.body
-        }, function (err, xhr, body) {
-            if (xhr.statusCode!=undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
-            return res.send("Successfully posted data to webhook.");
-        })
-}
-catch(err){
-console.log(err)
-}
+        try {
+            console.log("DATA: " + req.body.username + " - " + req.body.content)
+            let data = req.body
+            request({
+                url: target,
+                method: "POST",
+                json: req.body
+            }, function (err, xhr, body) {
+                if (xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
+                return res.send("Successfully posted data to webhook.");
+            })
+        }
+        catch (err) {
+            console.log(err)
+        }
     })
     console.log("Setup finished for: " + target)
     return ("http://" + discordbotlink + ":3000/" + inbound)
@@ -112,9 +111,9 @@ client.on('message', async message => {
                             fields: [{
                                 name: "Generic",
                                 value:
-                                "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
-                                + "Running on: " + client.guilds.size + " servers\n"
-                                + "Running for: " + client.users.size + " online users\n"
+                                    "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
+                                    + "Running on: " + client.guilds.size + " servers\n"
+                                    + "Running for: " + client.users.size + " online users\n"
                             },
                             {
                                 name: "Version " + botver,
@@ -123,7 +122,7 @@ client.on('message', async message => {
                             {
                                 name: "Back-end info",
                                 value:
-                                "Current server: " + OS.hostname() + "\n"
+                                    "Current server: " + OS.hostname() + "\n"
                             }
                             ],
                             timestamp: new Date(),
@@ -195,7 +194,7 @@ client.on('message', async message => {
                         message.author.send("All redirects for " + message.guild.name + ":")
                         for (var i = 0; i < links.length; i++) {
                             var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + discordbotlink + ":3000/")
-                            
+
                             message.author.send(links[i].webhook + "\nto\n" + inbound);
                         }
                     }
@@ -233,13 +232,13 @@ client.on('message', async message => {
                             fields: [{
                                 name: "Generic",
                                 value: "**ID:** " + message.guild.id + "\n"
-                                + "**Members:** " + message.guild.memberCount + "\n"
-                                + "**Owner:** " + message.guild.owner.user.tag + " - " + message.guild.ownerID + "\n"
-                                + "**Region:** " + message.guild.region + "\n"
-                                + "**Created at:** " + message.guild.createdAt + "\n"
-                                + "**Verification level:** " + message.guild.verificationLevel + "\n"
-                                + "**AFK timeout:** " + message.guild.afkTimeout / 60 + " minute(s)\n"
-                                + "**Icon:** " + message.guild.iconURL + "\n"
+                                    + "**Members:** " + message.guild.memberCount + "\n"
+                                    + "**Owner:** " + message.guild.owner.user.tag + " - " + message.guild.ownerID + "\n"
+                                    + "**Region:** " + message.guild.region + "\n"
+                                    + "**Created at:** " + message.guild.createdAt + "\n"
+                                    + "**Verification level:** " + message.guild.verificationLevel + "\n"
+                                    + "**AFK timeout:** " + message.guild.afkTimeout / 60 + " minute(s)\n"
+                                    + "**Icon:** " + message.guild.iconURL + "\n"
                             },
                             {
                                 name: "Roles",
@@ -346,6 +345,9 @@ client.on('message', async message => {
                         message.reply("Sorry, you need the Administrator permission to change this.");
                     }
                 }
+                else {
+                    GuildSpecificCommands(message);
+                }
             }
         }
         catch (error) {
@@ -354,6 +356,25 @@ client.on('message', async message => {
 
     }
 })
+
+function GuildSpecificCommands(message) {
+    var pass = false;
+    for (var i = 0; i < config.specialguilds.length; i++) {
+        if (message.guild.id == config.specialguilds[i]) {
+            pass = true;
+        }
+    }
+    if (pass) {
+        console.log("PASSED!");
+        messageParts = message.content.split(' ');
+        input = messageParts[0].toLowerCase();
+        parameters = messageParts.splice(1, messageParts.length);
+
+        if (input === prefix + "credits") {
+            message.reply("Try again later.")
+        }
+    }
+}
 
 function notallowed(command, id) {
     return "You are not allowed to use the " + prefix + command + " command."
