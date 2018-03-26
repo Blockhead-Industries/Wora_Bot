@@ -7,8 +7,6 @@ var connection = mysql.createConnection({
     database: 'wora'
 });
 
-// Most of this is atm vulnerable to SQL injection. Fix in future if I find time.
-
 connection.connect(function (err) {
     if (!err) {
         console.log("Database is connected");
@@ -20,7 +18,7 @@ connection.connect(function (err) {
 async function checkexist(id, fn) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + connection.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = false;
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -37,7 +35,7 @@ async function createserver(id,servername,members,prefix,owner,region) {
         servername = servername.replace("'", "''");
         owner = owner.replace("'", "''");
         region = region.replace("'", "''");
-        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES ('" + id.toString() + "', '" + servername + "', '" + members.toString() + "', '" + prefix + "', '" + owner + "', '"+region+"');", async function ExistCheck(err, result) {
+        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(connection.escape(servername)) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region)+");", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -56,7 +54,7 @@ function updateall(id, servername, members, owner, region) {
         servername = servername.replace("'", "''");
         owner = owner.replace("'", "''");
         region = region.replace("'", "''");
-        connection.query("UPDATE `servers` SET `servername`='" + servername + "', `members`='" + members.toString() + "', `owner`='" + owner + "', `region`='" + region + "' WHERE `serverid`='" + id.toString() + "';", async function ExistCheck(err, result) {
+        connection.query("UPDATE `servers` SET `servername`=" + mysql.escape(servername) + ", `members`=" + mysql.escape(members.toString()) + ", `owner`=" + mysql.escape(owner) + ", `region`=" + mysql.escape(region) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -69,7 +67,7 @@ function updateall(id, servername, members, owner, region) {
 function update(id, toset, newval) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("UPDATE `servers` SET `"+toset+"`='" + newval  + "' WHERE `serverid`='" + id.toString() + "';", async function ExistCheck(err, result) {
+        connection.query("UPDATE `servers` SET " + mysql.escape(toset) + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -83,7 +81,7 @@ function update(id, toset, newval) {
 function checkprefix(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -97,7 +95,7 @@ function checkprefix(id) {
 function checkvalue(id,valuetocheck) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id)  + "", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -111,7 +109,7 @@ function checkvalue(id,valuetocheck) {
 function deleterecord(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("DELETE FROM webhooks WHERE webhook='" + id.toString() + "';", async function ExistCheck(err, result) {
+        connection.query("DELETE FROM webhooks WHERE webhook=" + mysql.escape(id)  + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't delete record!");
@@ -172,7 +170,7 @@ module.exports = {
     createwebhook: async function (id, webhook) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("INSERT INTO webhooks (`webhook`, `serverid`) VALUES ('" + webhook.toString() + "','" + id.toString() + "');", async function ExistCheck(err, result) {
+        connection.query("INSERT INTO webhooks (`webhook`, `serverid`) VALUES (" + mysql.escape(webhook) + "," + mysql.escape(id) + ");", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -185,7 +183,7 @@ module.exports = {
     getallwebhooks: async function (id) {
         var returned;
         return new Promise(function (resolve, reject) {
-            connection.query("SELECT * FROM webhooks WHERE  serverid=" + id + ";", async function ExistCheck(err, result) {
+            connection.query("SELECT * FROM webhooks WHERE serverid=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
                     console.log(err);
                     resolve("Couldn't retrieve record!");

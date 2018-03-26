@@ -44,8 +44,8 @@ client.on('guildCreate', async guild => {
 });
 
 client.on('guildDelete', async guild => {
-    console.log(`Removed from a discord! ` + guild.name + " - " + (guild.memberCount) + " members");
-    sendtoadmin(`Removed from a discord ` + guild.name + " - " + (guild.memberCount) + " members");
+    console.log(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
+    sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
 }); 
 
 function sendtoadmin(message) {
@@ -182,7 +182,7 @@ client.on('message', async message => {
                                 if (tick != "Couldn't create record!") {
                                     var link = await setuplink(parameters[0])
                                     mes.author.send("Finished and completed setup. You can use this webhook: " + link)
-                                    sendtoadmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.guild.author.tag);
+                                    sendtoadmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
                                 }
                                 else {
                                     message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
