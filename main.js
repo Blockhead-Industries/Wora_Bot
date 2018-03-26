@@ -6,7 +6,6 @@ const client = new Discord.Client();
 const discordtoken = config.discordtoken;
 
 const OS = require('os');
-
 const express = require('express')
 const request = require('request')
 const bodyParser = require('body-parser')
@@ -34,17 +33,30 @@ var commands = [
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    console.log(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
-    client.fetchUser("124928188647211009")
-        .then((User) => {
-            User.send("I have been started on " + OS.hostname() + " - " + botver);
+    sendtoadmin("I have been started on: " + OS.hostname() + " - " + botver);
+    sendtoadmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
+    client.user.setActivity(statusbot);
+});
 
+client.on('guildCreate', async guild => {
+    console.log(`Added to a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
+    sendtoadmin(`Added to a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
+});
+
+client.on('guildDelete', async guild => {
+    console.log(`Removed from a discord! ` + guild.name + " - " + (guild.memberCount) + " members");
+    sendtoadmin(`Removed from a discord ` + guild.name + " - " + (guild.memberCount) + " members");
+}); 
+
+function sendtoadmin(message) {
+    client.fetchUser(config.adminuser)
+        .then((User) => {
+            User.send(message);
         })
         .catch((err) => {
             console.log("Error with finding a user: " + err);
         })
-    client.user.setActivity(statusbot);
-});
+}
 
 function setuplink(target) {
     console.log("Setup for: " + target)
@@ -113,7 +125,8 @@ client.on('message', async message => {
                                 value:
                                     "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
                                     + "Running on: " + client.guilds.size + " servers\n"
-                                    + "Running for: " + client.users.size + " online users\n"
+                                    + "Running for: " + client.users.size + " online users\n" + "\n"
+                                    + "Github: " + config.github
                             },
                             {
                                 name: "Version " + botver,
@@ -169,6 +182,7 @@ client.on('message', async message => {
                                 if (tick != "Couldn't create record!") {
                                     var link = await setuplink(parameters[0])
                                     mes.author.send("Finished and completed setup. You can use this webhook: " + link)
+                                    sendtoadmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.guild.author.tag);
                                 }
                                 else {
                                     message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
@@ -345,6 +359,84 @@ client.on('message', async message => {
                         message.reply("Sorry, you need the Administrator permission to change this.");
                     }
                 }
+                else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
+                    auser = message.author.id;
+                    if (parameters[0] != (undefined)) {
+                        dothis = parameters[0];
+                        dothis = dothis.replace("<@!", "");
+                        dothis = dothis.replace("<@", "");
+                        auser = dothis.replace(">", "");
+                    }
+                    gotuser = await client.fetchUser(auser);
+                    gotmember = await message.guild.fetchMember(gotuser);
+                    try {
+                        presencetable = {};
+                        if (gotuser.presence.game == undefined) {
+                            presencetable = {
+                                name: "Status",
+                                value: "\n" + "**Presence:** " + gotuser.presence.status
+                            };
+                        }
+                        else if (gotuser.presence.game.streaming == false) {
+                            presencetable = {
+                                name: "Status",
+                                value: "\n" + "**Presence:** " + gotuser.presence.status +
+                                "\n" + "**Current game:** " + gotuser.presence.game.name
+                            };
+                        }
+                        else {
+                            presencetable = {
+                                name: "Status",
+                                value: "\n" + "**Presence:** " + gotuser.presence.status +
+                                "\n" + "**Current game:** " + gotuser.presence.game.name +
+                                "\n" + "**Streaming:** " + gotuser.presence.game.streaming + " - " + gotuser.presence.game.url +
+                                "\n" + "**Game type:** " + gotuser.presence.game.type
+                            };
+                        }
+                        roleoutput = "";
+                        gotmember.roles.forEach(function (element) {
+                            roleoutput = roleoutput + ", " + element.name;
+                        });
+                        roleoutput = roleoutput.substr(3, roleoutput.length);
+                        messagearray = {
+                            embed: {
+                                color: 3066993,
+                                author: {
+                                    name: "User information for " + gotuser.username,
+                                    icon_url: gotuser.avatarURL
+                                },
+                                fields: [{
+                                    name: "Generic",
+                                    value: "**Bot**: " + gotuser.bot +
+                                    "\n" + "**Tag**: " + gotuser.tag +
+                                    "\n" + "**User ID**: " + gotuser.id +
+                                    "\n" + "**Avatar**: " + gotuser.avatarURL +
+                                    "\n" + "**Joined discord on**: " + gotuser.createdAt
+                                },
+                                {
+                                    name: "Guild specific info",
+                                    value: "**Nickname**: " + (gotmember.nickname || "None") + "\n" +
+                                    "**Joined this guild on**: " + gotmember.joinedAt + "\n" +
+                                    "**Strongest role**: " + gotmember.highestRole.name + "\n" +
+                                    "**Server muted**: " + gotmember.serverMute + "\n" +
+                                    "**Roles**: " + roleoutput
+                                },
+
+                                    presencetable
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    icon_url: client.user.avatarURL,
+                                    text: discordbotlink
+                                }
+                            }
+                        };
+                        message.reply(messagearray);
+                    }
+                    catch (err) {
+                        message.reply("Couldn't make an embedded post for you. Sorry!");
+                    }
+                }
                 else {
                     GuildSpecificCommands(message);
                 }
@@ -402,6 +494,7 @@ async function start() {
     for (var i = 0; i < links.length; i++) {
         setuplink(links[i].webhook)
     }
+    sendtoadmin("Finished setup for " + links.length.toString() + " webhooks.")
 }
 
 start();
