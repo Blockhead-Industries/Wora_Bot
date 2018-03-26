@@ -48,14 +48,22 @@ client.on('guildDelete', async guild => {
     sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
 }); 
 
-function sendtoadmin(message) {
-    client.fetchUser(config.adminuser)
-        .then((User) => {
-            User.send(message);
-        })
-        .catch((err) => {
-            console.log("Error with finding a user: " + err);
-        })
+function getadminuser() {
+    return new Promise(async function (resolve, reject) {
+        console.log("getting admin user.")
+        resolve(await client.fetchUser(config.adminuser));
+    })
+}
+
+var admin;
+async function sendtoadmin(message) {
+    console.log(admin);
+    if (admin==undefined) {
+        console.log("Getting admin user");
+        admin = await getadminuser();
+    }
+    console.log("Sending message: " + message.toString());
+    admin.send(message.toString());
 }
 
 function setuplink(target) {
@@ -497,7 +505,10 @@ async function start() {
     sendtoadmin("Finished setup for " + links.length.toString() + " webhooks.")
 }
 
-start();
 client.login(discordtoken);
+
+setTimeout(function () {
+    start();
+}, 3000);
 
 console.log("Bot has started");
