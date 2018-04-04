@@ -71,7 +71,7 @@ function setuplink(target) {
     var inbound = target.replace("https://discordapp.com/api/webhooks/", "")
     app.post("/" + inbound, function (req, res) {
         try {
-            console.log("DATA: " + req.body.username + " - " + req.body.content)
+            console.log(target + " - DATA: " + req.body.username + " - " + req.body.content);
             let data = req.body
             request({
                 url: target,
@@ -79,8 +79,12 @@ function setuplink(target) {
                 json: req.body
             }, function (err, xhr, body) {
                 if (xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
+                if (!req.body.content.length) {
+                    sendtoadmin("Being triggered without data by: " + target);
+                }
                 return res.send("Successfully posted data to webhook.");
-            })
+                })
+
         }
         catch (err) {
             console.log(err)
@@ -338,7 +342,7 @@ client.on('message', async message => {
                                 }
                             });
                             if (found == true) {
-                                if (sql.updatevalue(message.guild.id, "PermRole", roleid)) {
+                                if (await sql.updatevalue(message.guild.id, "PermRole", roleid)) {
                                     message.reply("I have set the role " + rolename + " to control me.");
                                 }
                                 else {
@@ -469,7 +473,6 @@ function GuildSpecificCommands(message) {
         }
     }
     if (pass) {
-        console.log("PASSED!");
         messageParts = message.content.split(' ');
         input = messageParts[0].toLowerCase();
         parameters = messageParts.splice(1, messageParts.length);

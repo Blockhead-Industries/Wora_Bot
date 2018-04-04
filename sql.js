@@ -62,7 +62,7 @@ function update(id, toset, newval) {
     var returned;
     return new Promise(function (resolve, reject) {
         try {
-            connection.query("UPDATE `servers` SET " + mysql.escape(toset) + "=" + mysql.escape(newval) + " WHERE `serverid`=" + id + ";", async function ExistCheck(err, result) {
+            connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + id + ";", async function ExistCheck(err, result) {
                 if (err) {
                     console.log(err);
                     resolve("Couldn't create record!");
