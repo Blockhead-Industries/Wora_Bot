@@ -338,8 +338,12 @@ client.on('message', async message => {
                                 }
                             });
                             if (found == true) {
-                                sql.updatevalue(message.guild.id, "PermRole", roleid)
-                                message.reply("I have set the role " + rolename + " to control me.");
+                                if (sql.updatevalue(message.guild.id, "PermRole", roleid)) {
+                                    message.reply("I have set the role " + rolename + " to control me.");
+                                }
+                                else {
+                                    message.reply("An error occured while setting this role. Try again later.");
+                                }
                             }
                             else {
                                 message.reply("I couldn't find that role ;(");

@@ -32,9 +32,6 @@ async function checkexist(id, fn) {
 async function createserver(id,servername,members,prefix,owner,region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        servername = servername.replace("'", "''");
-        owner = owner.replace("'", "''");
-        region = region.replace("'", "''");
         connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(connection.escape(servername)) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region)+");", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
@@ -51,9 +48,6 @@ async function createserver(id,servername,members,prefix,owner,region) {
 function updateall(id, servername, members, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        servername = servername.replace("'", "''");
-        owner = owner.replace("'", "''");
-        region = region.replace("'", "''");
         connection.query("UPDATE `servers` SET `servername`=" + mysql.escape(servername) + ", `members`=" + mysql.escape(members.toString()) + ", `owner`=" + mysql.escape(owner) + ", `region`=" + mysql.escape(region) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
@@ -67,13 +61,18 @@ function updateall(id, servername, members, owner, region) {
 function update(id, toset, newval) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("UPDATE `servers` SET " + mysql.escape(toset) + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
-            if (err) {
-                console.log(err);
-                resolve("Couldn't create record!");
-            }
-            resolve("Successfully changed");
-        });
+        try {
+            connection.query("UPDATE `servers` SET " + mysql.escape(toset) + "=" + mysql.escape(newval) + " WHERE `serverid`=" + id + ";", async function ExistCheck(err, result) {
+                if (err) {
+                    console.log(err);
+                    resolve("Couldn't create record!");
+                }
+                resolve(true);
+            });
+        }
+        catch (err) {
+            resolve(false);
+        }
     });
 }
 
