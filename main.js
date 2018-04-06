@@ -1,11 +1,21 @@
 const config = require("./config.json");
 const sql = require("./sql.js");
 
+const OS = require('os');
+
+const configcommands = require("./Commands/configuration.js");
+const infocommands = require("./Commands/info.js");
+const webhookcommands = require("./Commands/webhook.js");
+
+configcommands.init(sql, config);
+infocommands.init(sql, config,OS);
+webhookcommands.init(sql, config);
+
+
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const discordtoken = config.discordtoken;
 
-const OS = require('os');
 const express = require('express')
 const request = require('request')
 const bodyParser = require('body-parser')
@@ -39,12 +49,10 @@ client.on('ready', () => {
 });
 
 client.on('guildCreate', async guild => {
-    console.log(`Added to a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
     sendtoadmin(`Added to a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
 });
 
 client.on('guildDelete', async guild => {
-    console.log(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
     sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
 }); 
 
@@ -57,7 +65,7 @@ function getadminuser() {
 
 var admin;
 async function sendtoadmin(message) {
-    console.log(admin);
+    console.log(message);
     if (admin==undefined) {
         console.log("Getting admin user");
         admin = await getadminuser();
@@ -122,65 +130,13 @@ client.on('message', async message => {
                 prefix = await sql.getprefix(message.guild.id);
                 gotroleid = await sql.getvalue(message.guild.id, "PermRole");
                 if (input === prefix + "ping") {
-                    message.reply('My ping to discord is ' + client.ping + ' ms.');
+                    infocommands.ping(client,message);
                 }
                 else if (input === prefix + "you") {
-                    message.reply({
-                        embed: {
-                            color: 3447003,
-                            author: {
-                                name: "Bot information for " + client.user.tag + "",
-                                icon_url: client.user.avatarURL
-                            },
-                            fields: [{
-                                name: "Generic",
-                                value:
-                                    "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
-                                    + "Running on: " + client.guilds.size + " servers\n"
-                                    + "Running for: " + client.users.size + " online users\n" + "\n"
-                                    + "Github: " + config.github
-                            },
-                            {
-                                name: "Version " + botver,
-                                value: versioninfo
-                            },
-                            {
-                                name: "Back-end info",
-                                value:
-                                    "Current server: " + OS.hostname() + "\n"
-                            }
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                icon_url: client.user.avatarURL,
-                                text: discordbotlink
-                            }
-                        }
-                    });
+                    infocommands.botinfo(client,message);
                 }
                 else if (input === prefix + "deletelink") {
-                    if (await PermCheck(message, message.author, gotroleid) == true) {
-                        if (parameters.length != 0) {
-                            if (parameters[0].includes("https://discordapp.com/api/webhooks/")) {
-                                message.reply("I will send messages in private, execute commands here. I deleted your message to ensure our safety!")
-                                var mes = message;
-                                message.delete()
-                                mes.author.send("Deleting " + parameters[0])
-                                var k = await sql.delete(parameters[0])
-                                message.reply(k)
-                                mes.author.send(k)
-                            }
-                            else {
-                                message.reply("That is not a valid url!")
-                            }
-                        }
-                        else {
-                            message.reply("I need a discord webhook url!")
-                        }
-                    }
-                    else {
-                        message.reply(notallowed("prefix", message.guild.id))
-                    }
+                    webhookcommands.deletelink(client, message);
                 }
                 else if (input === prefix + "link") {
                     if (await PermCheck(message, message.author, gotroleid) == true) {
@@ -324,134 +280,10 @@ client.on('message', async message => {
                     message.reply(messagearray);
                 }
                 else if (input === prefix + "botcontrol") {
-                    if (message.member.hasPermission("ADMINISTRATOR")) {
-                        if (parameters[0] != ("" || undefined)) {
-                            bigpara = "";
-                            for (var i = 0; i < parameters.length; i++) {
-                                bigpara = bigpara + " " + parameters[i]
-                            }
-                            bigpara = bigpara.substr(1, bigpara.length);
-                            var found = false;
-                            var roleid = 0;
-                            var rolename = "";
-                            message.guild.roles.forEach(function (element) {
-                                if (element.name == bigpara) {
-                                    found = true;
-                                    roleid = element.id;
-                                    rolename = element.name;
-                                }
-                            });
-                            if (found == true) {
-                                if (await sql.updatevalue(message.guild.id, "PermRole", roleid)) {
-                                    message.reply("I have set the role " + rolename + " to control me.");
-                                }
-                                else {
-                                    message.reply("An error occured while setting this role. Try again later.");
-                                }
-                            }
-                            else {
-                                message.reply("I couldn't find that role ;(");
-                            }
-                        }
-                        else {
-                            roleid = 0;
-                            rolename = "";
-                            message.guild.roles.forEach(function (element) {
-                                if (element.id == gotroleid) {
-                                    found = true;
-                                    roleid = element.id;
-                                    rolename = element.name;
-                                }
-                            });
-                            if (roleid != 0) {
-                                message.reply("The role that can control me is " + rolename + ".");
-                            }
-                            else {
-                                message.reply("No role has been set to control me. qq");
-                            }
-                        }
-                    }
-                    else {
-                        message.reply("Sorry, you need the Administrator permission to change this.");
-                    }
+                    configcommands.setbotcontrol(message)
                 }
                 else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
-                    auser = message.author.id;
-                    if (parameters[0] != (undefined)) {
-                        dothis = parameters[0];
-                        dothis = dothis.replace("<@!", "");
-                        dothis = dothis.replace("<@", "");
-                        auser = dothis.replace(">", "");
-                    }
-                    gotuser = await client.fetchUser(auser);
-                    gotmember = await message.guild.fetchMember(gotuser);
-                    try {
-                        presencetable = {};
-                        if (gotuser.presence.game == undefined) {
-                            presencetable = {
-                                name: "Status",
-                                value: "\n" + "**Presence:** " + gotuser.presence.status
-                            };
-                        }
-                        else if (gotuser.presence.game.streaming == false) {
-                            presencetable = {
-                                name: "Status",
-                                value: "\n" + "**Presence:** " + gotuser.presence.status +
-                                "\n" + "**Current game:** " + gotuser.presence.game.name
-                            };
-                        }
-                        else {
-                            presencetable = {
-                                name: "Status",
-                                value: "\n" + "**Presence:** " + gotuser.presence.status +
-                                "\n" + "**Current game:** " + gotuser.presence.game.name +
-                                "\n" + "**Streaming:** " + gotuser.presence.game.streaming + " - " + gotuser.presence.game.url +
-                                "\n" + "**Game type:** " + gotuser.presence.game.type
-                            };
-                        }
-                        roleoutput = "";
-                        gotmember.roles.forEach(function (element) {
-                            roleoutput = roleoutput + ", " + element.name;
-                        });
-                        roleoutput = roleoutput.substr(3, roleoutput.length);
-                        messagearray = {
-                            embed: {
-                                color: 3066993,
-                                author: {
-                                    name: "User information for " + gotuser.username,
-                                    icon_url: gotuser.avatarURL
-                                },
-                                fields: [{
-                                    name: "Generic",
-                                    value: "**Bot**: " + gotuser.bot +
-                                    "\n" + "**Tag**: " + gotuser.tag +
-                                    "\n" + "**User ID**: " + gotuser.id +
-                                    "\n" + "**Avatar**: " + gotuser.avatarURL +
-                                    "\n" + "**Joined discord on**: " + gotuser.createdAt
-                                },
-                                {
-                                    name: "Guild specific info",
-                                    value: "**Nickname**: " + (gotmember.nickname || "None") + "\n" +
-                                    "**Joined this guild on**: " + gotmember.joinedAt + "\n" +
-                                    "**Strongest role**: " + gotmember.highestRole.name + "\n" +
-                                    "**Server muted**: " + gotmember.serverMute + "\n" +
-                                    "**Roles**: " + roleoutput
-                                },
-
-                                    presencetable
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    icon_url: client.user.avatarURL,
-                                    text: discordbotlink
-                                }
-                            }
-                        };
-                        message.reply(messagearray);
-                    }
-                    catch (err) {
-                        message.reply("Couldn't make an embedded post for you. Sorry!");
-                    }
+                    infocommands.userinfo(client,message);
                 }
                 else {
                     GuildSpecificCommands(message);
