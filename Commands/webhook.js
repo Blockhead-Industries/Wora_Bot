@@ -1,6 +1,22 @@
 ﻿var sql;
 var config;
 
+function PermCheck(message, user, roleid) {
+    var val = false;
+    return new Promise(function (resolve, reject) {
+        roletarget = parseInt(roleid);
+        message.member.roles.forEach(function (element) {
+            if (roletarget == parseInt(element.id)) {
+                val = true;
+            }
+        });
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+            val = true;
+        }
+        resolve(val);
+    })
+}
+
 module.exports = {
     init: function (s,c){
         sql = s;

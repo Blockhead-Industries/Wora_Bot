@@ -1,12 +1,40 @@
 ﻿var sql;
 var config;
 
+function PermCheck(message, user, roleid) {
+    var val = false;
+    return new Promise(function (resolve, reject) {
+        roletarget = parseInt(roleid);
+        message.member.roles.forEach(function (element) {
+            if (roletarget == parseInt(element.id)) {
+                val = true;
+            }
+        });
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+            val = true;
+        }
+        resolve(val);
+    })
+}
+
 module.exports = {
     init: function (s,c){
         sql = s;
         config = c;
     },
 
+    setprefix: async function (client, message, parameters) {
+        if (await PermCheck(message, message.author, gotroleid) == true) {
+            if (parameters.length != 0) {
+                //prefixset[message.guild.id] = parameters[0];
+                sql.setprefix(message.guild.id, parameters[0])
+                message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
+            }
+        }
+        else {
+            message.reply(notallowed("prefix", message.guild.id))
+        }  
+    },
     setbotcontrol: async function (message) {
         if (message.member.hasPermission("ADMINISTRATOR")) {
             if (parameters[0] != ("" || undefined)) {

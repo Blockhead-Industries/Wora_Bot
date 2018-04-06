@@ -87,7 +87,7 @@ function setuplink(target) {
                 json: req.body
             }, function (err, xhr, body) {
                 if (xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
-                if (!req.body.content.length) {
+                if (req.body.username == undefined && req.body.content=="") {
                     sendtoadmin("Being triggered without data by: " + target);
                 }
                 return res.send("Successfully posted data to webhook.");
@@ -185,16 +185,7 @@ client.on('message', async message => {
                     }
                 }
                 else if (input === prefix + "prefix") {
-                    if (await PermCheck(message, message.author, gotroleid) == true) {
-                        if (parameters.length != 0) {
-                            //prefixset[message.guild.id] = parameters[0];
-                            sql.setprefix(message.guild.id, parameters[0])
-                            message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
-                        }
-                    }
-                    else {
-                        message.reply(notallowed("prefix", message.guild.id))
-                    }
+                    configcommands.setprefix(client, message, parameters);
                 }
                 else if (input === prefix + "serverinfo") {
                     // console.log(message.guild.roles);
