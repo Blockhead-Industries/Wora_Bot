@@ -41,7 +41,7 @@ var commands = [
 ];
 
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     await sendtoadmin("I have been started on: " + OS.hostname() + " - " + botver);
     await sendtoadmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
