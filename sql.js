@@ -18,7 +18,7 @@ connection.connect(function (err) {
 async function checkexist(id, fn) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + connection.escape(id) + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = false;
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -32,7 +32,7 @@ async function checkexist(id, fn) {
 async function createserver(id,servername,members,prefix,owner,region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(connection.escape(servername)) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region)+");", async function ExistCheck(err, result) {
+        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(servername) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region)+");", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -62,7 +62,7 @@ function update(id, toset, newval) {
     var returned;
     return new Promise(function (resolve, reject) {
         try {
-            connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + id + ";", async function ExistCheck(err, result) {
+            connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
                     console.log(err);
                     resolve("Couldn't create record!");
