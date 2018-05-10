@@ -56,22 +56,30 @@ client.on('guildDelete', async guild => {
     sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
 });
 
+var admins;
+
 function getadminuser() {
     return new Promise(async function (resolve, reject) {
-        console.log("getting admin user.")
-        resolve(await client.fetchUser(config.adminuser));
+        var result = [];
+        config.admins.forEach(async function (admin) {
+            console.log("getting admin user: " + admin.toString());
+            var x = await client.fetchUser(admin.toString());
+            result.push(x);
+        });
+        resolve(result);
     })
 }
 
-var admin;
 async function sendtoadmin(message) {
     console.log(message);
-    if (admin == undefined) {
-        console.log("Getting admin user");
-        admin = await getadminuser();
+    if (admins == undefined) {
+        admins = await getadminuser();
     }
     console.log("Sending message: " + message.toString());
-    admin.send(message.toString());
+    admins.forEach(function (admin) {
+        admin.send(message.toString());
+    });
+
 }
 
 function setuplink(target) {
