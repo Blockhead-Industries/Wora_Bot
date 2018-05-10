@@ -24,10 +24,10 @@ module.exports = {
                 fields: [{
                     name: "Generic",
                     value:
-                    "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
-                    + "Running on: " + client.guilds.size + " servers\n"
-                    + "Running for: " + client.users.size + " online users\n" + "\n"
-                    + "Github: " + config.github
+                        "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
+                        + "Running on: " + client.guilds.size + " servers\n"
+                        + "Running for: " + client.users.size + " online users\n" + "\n"
+                        + "Github: " + config.github
                 },
                 {
                     name: "Version " + config.botver,
@@ -36,7 +36,7 @@ module.exports = {
                 {
                     name: "Back-end info",
                     value:
-                    "Current server: " + OS.hostname() + "\n"
+                        "Current server: " + OS.hostname() + "\n"
                 }
                 ],
                 timestamp: new Date(),
@@ -48,7 +48,7 @@ module.exports = {
         });
     },
 
-    userinfo : async function (client, message) {
+    userinfo: async function (client, message) {
         auser = message.author.id;
         if (parameters[0] != (undefined)) {
             dothis = parameters[0];
@@ -70,16 +70,16 @@ module.exports = {
                 presencetable = {
                     name: "Status",
                     value: "\n" + "**Presence:** " + gotuser.presence.status +
-                    "\n" + "**Current game:** " + gotuser.presence.game.name
+                        "\n" + "**Current game:** " + gotuser.presence.game.name
                 };
             }
             else {
                 presencetable = {
                     name: "Status",
                     value: "\n" + "**Presence:** " + gotuser.presence.status +
-                    "\n" + "**Current game:** " + gotuser.presence.game.name +
-                    "\n" + "**Streaming:** " + gotuser.presence.game.streaming + " - " + gotuser.presence.game.url +
-                    "\n" + "**Game type:** " + gotuser.presence.game.type
+                        "\n" + "**Current game:** " + gotuser.presence.game.name +
+                        "\n" + "**Streaming:** " + gotuser.presence.game.streaming + " - " + gotuser.presence.game.url +
+                        "\n" + "**Game type:** " + gotuser.presence.game.type
                 };
             }
             roleoutput = "";
@@ -97,18 +97,18 @@ module.exports = {
                     fields: [{
                         name: "Generic",
                         value: "**Bot**: " + gotuser.bot +
-                        "\n" + "**Tag**: " + gotuser.tag +
-                        "\n" + "**User ID**: " + gotuser.id +
-                        "\n" + "**Avatar**: " + gotuser.avatarURL +
-                        "\n" + "**Joined discord on**: " + gotuser.createdAt
+                            "\n" + "**Tag**: " + gotuser.tag +
+                            "\n" + "**User ID**: " + gotuser.id +
+                            "\n" + "**Avatar**: " + gotuser.avatarURL +
+                            "\n" + "**Joined discord on**: " + gotuser.createdAt
                     },
                     {
                         name: "Guild specific info",
                         value: "**Nickname**: " + (gotmember.nickname || "None") + "\n" +
-                        "**Joined this guild on**: " + gotmember.joinedAt + "\n" +
-                        "**Strongest role**: " + gotmember.highestRole.name + "\n" +
-                        "**Server muted**: " + gotmember.serverMute + "\n" +
-                        "**Roles**: " + roleoutput
+                            "**Joined this guild on**: " + gotmember.joinedAt + "\n" +
+                            "**Strongest role**: " + gotmember.highestRole.name + "\n" +
+                            "**Server muted**: " + gotmember.serverMute + "\n" +
+                            "**Roles**: " + roleoutput
                     },
 
                         presencetable
