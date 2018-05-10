@@ -18,7 +18,7 @@ function PermCheck(message, user, roleid) {
 }
 
 module.exports = {
-    init: function (s,c){
+    init: function (s, c) {
         sql = s;
         config = c;
     },
@@ -33,7 +33,7 @@ module.exports = {
         }
         else {
             message.reply(notallowed("prefix", message.guild.id))
-        }  
+        }
     },
     setbotcontrol: async function (message) {
         if (message.member.hasPermission("ADMINISTRATOR")) {

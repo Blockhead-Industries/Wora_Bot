@@ -11,7 +11,7 @@ connection.connect(function (err) {
     if (!err) {
         console.log("Database is connected");
     } else {
-        console.log("Error connecting database: "+err);
+        console.log("Error connecting database: " + err);
     }
 });
 
@@ -29,10 +29,10 @@ async function checkexist(id, fn) {
     });
 }
 
-async function createserver(id,servername,members,prefix,owner,region) {
+async function createserver(id, servername, members, prefix, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(servername) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region)+");", async function ExistCheck(err, result) {
+        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(servername) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region) + ");", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -91,10 +91,10 @@ function checkprefix(id) {
     });
 }
 
-function checkvalue(id,valuetocheck) {
+function checkvalue(id, valuetocheck) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id)  + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -108,7 +108,7 @@ function checkvalue(id,valuetocheck) {
 function deleterecord(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("DELETE FROM webhooks WHERE webhook=" + mysql.escape(id)  + ";", async function ExistCheck(err, result) {
+        connection.query("DELETE FROM webhooks WHERE webhook=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't delete record!");
@@ -125,7 +125,7 @@ module.exports = {
     },
 
     create: async function (id, servername, members, prefix, owner, region) {
-        var boola = await createserver(id, servername, members, prefix, owner,region);
+        var boola = await createserver(id, servername, members, prefix, owner, region);
         return boola;
     },
 
@@ -143,8 +143,8 @@ module.exports = {
         return boola;
     },
 
-    setprefix: async function (serverid,newprefix) {
-        boola = await update(serverid,"prefix",newprefix);
+    setprefix: async function (serverid, newprefix) {
+        boola = await update(serverid, "prefix", newprefix);
         console.log("set prefix: " + boola);
         return boola;
     },
@@ -155,7 +155,7 @@ module.exports = {
         return boola;
     },
 
-    updatevalue: async function (serverid,valuetoupdate, newvalue) {
+    updatevalue: async function (serverid, valuetoupdate, newvalue) {
         boola = await update(serverid, valuetoupdate, newvalue);
         console.log("set newvalue: " + newvalue);
         return boola;
@@ -167,16 +167,16 @@ module.exports = {
     },
 
     createwebhook: async function (id, webhook) {
-    var returned;
-    return new Promise(function (resolve, reject) {
-        connection.query("INSERT INTO webhooks (`webhook`, `serverid`) VALUES (" + mysql.escape(webhook) + "," + mysql.escape(id) + ");", async function ExistCheck(err, result) {
-            if (err) {
-                console.log(err);
-                resolve("Couldn't create record!");
-            }
-            resolve("Successfully added");
+        var returned;
+        return new Promise(function (resolve, reject) {
+            connection.query("INSERT INTO webhooks (`webhook`, `serverid`) VALUES (" + mysql.escape(webhook) + "," + mysql.escape(id) + ");", async function ExistCheck(err, result) {
+                if (err) {
+                    console.log(err);
+                    resolve("Couldn't create record!");
+                }
+                resolve("Successfully added");
+            });
         });
-    });
     },
 
     getallwebhooks: async function (id) {

@@ -8,7 +8,7 @@ const infocommands = require("./Commands/info.js");
 const webhookcommands = require("./Commands/webhook.js");
 
 configcommands.init(sql, config);
-infocommands.init(sql, config,OS);
+infocommands.init(sql, config, OS);
 webhookcommands.init(sql, config);
 
 
@@ -54,7 +54,7 @@ client.on('guildCreate', async guild => {
 
 client.on('guildDelete', async guild => {
     sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
-}); 
+});
 
 function getadminuser() {
     return new Promise(async function (resolve, reject) {
@@ -66,7 +66,7 @@ function getadminuser() {
 var admin;
 async function sendtoadmin(message) {
     console.log(message);
-    if (admin==undefined) {
+    if (admin == undefined) {
         console.log("Getting admin user");
         admin = await getadminuser();
     }
@@ -87,11 +87,11 @@ function setuplink(target) {
                 json: req.body
             }, function (err, xhr, body) {
                 if (xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
-                if (req.body.username == undefined && req.body.content=="") {
+                if (req.body.username == undefined && req.body.content == "") {
                     sendtoadmin("Being triggered without data by: " + target);
                 }
                 return res.send("Successfully posted data to webhook.");
-                })
+            })
 
         }
         catch (err) {
@@ -130,10 +130,10 @@ client.on('message', async message => {
                 prefix = await sql.getprefix(message.guild.id);
                 gotroleid = await sql.getvalue(message.guild.id, "PermRole");
                 if (input === prefix + "ping") {
-                    infocommands.ping(client,message);
+                    infocommands.ping(client, message);
                 }
                 else if (input === prefix + "you") {
-                    infocommands.botinfo(client,message);
+                    infocommands.botinfo(client, message);
                 }
                 else if (input === prefix + "deletelink") {
                     webhookcommands.deletelink(client, message);
@@ -274,7 +274,7 @@ client.on('message', async message => {
                     configcommands.setbotcontrol(message)
                 }
                 else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
-                    infocommands.userinfo(client,message);
+                    infocommands.userinfo(client, message);
                 }
                 else {
                     GuildSpecificCommands(message);

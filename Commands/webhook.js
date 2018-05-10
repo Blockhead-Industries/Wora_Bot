@@ -18,7 +18,7 @@ function PermCheck(message, user, roleid) {
 }
 
 module.exports = {
-    init: function (s,c){
+    init: function (s, c) {
         sql = s;
         config = c;
     },
