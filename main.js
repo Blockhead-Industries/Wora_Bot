@@ -79,7 +79,6 @@ async function sendtoadmin(message) {
     admins.forEach(function (admin) {
         admin.send(message.toString());
     });
-
 }
 
 function setuplink(target) {
@@ -94,7 +93,7 @@ function setuplink(target) {
                 method: "POST",
                 json: req.body
             }, function (err, xhr, body) {
-                if (xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
+                if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
                 if (req.body.username == undefined && req.body.content == "") {
                     sendtoadmin("Being triggered without data by: " + target);
                 }
@@ -116,7 +115,11 @@ app.listen(3000, function () {
 
 client.on('message', async message => {
     if (message.channel.type === 'dm' && message.author != client.user) { //dm
-        message.reply("Hi! I have no functioning commands here. If you want to talk about me contact @Enes#0618")
+        var string;
+        config.admins.forEach(async function (admin) {
+            string += " <@" + admin + ">";
+        });
+        message.reply("Hi! I have no functioning commands here. If you want to talk about me contact "+string+".")
     }
     else if (message.author != client.user && message.guild.available) {
         const user = message.author;
