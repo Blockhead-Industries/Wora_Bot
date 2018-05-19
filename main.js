@@ -134,7 +134,7 @@ client.on('message', async message => {
         const permmember = await message.channel.permissionsFor(client.user);
         try {
             console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
-            if (user != client.user && permmember.has("SEND_MESSAGES")) {
+            if (user != client.user && permmember.has("SEND_MESSAGES") && !message.author.tag.includes("#0000")) {
                 messageParts = message.content.split(' ');
                 input = messageParts[0].toLowerCase();
                 parameters = messageParts.splice(1, messageParts.length);
