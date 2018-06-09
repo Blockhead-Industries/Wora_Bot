@@ -1,3 +1,4 @@
+<a href="https://david-dm.org/enessene/wora" title="dependencies status"><img src="https://david-dm.org/enessene/wora/status.svg"/></a>
 # Wora
 The webhook bot. The bot allows you to create webhook redirects through discord commands.
 
