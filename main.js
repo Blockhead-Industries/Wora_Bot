@@ -138,7 +138,7 @@ client.on('message', async message => {
 
                 const permmember = await message.channel.permissionsFor(client.user);
                 try {
-                    if (user.tag === client.user.tag) {
+                    if (user.tag !== client.user.tag) {
                         console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
 
                         messageParts = message.content.split(' ');
