@@ -119,7 +119,7 @@ client.on('message', async message => {
         if (message.channel.type === 'dm') { //dm
             var string = "";
             config.admins.forEach(async function (admin) {
-                string += "or <@" + admin + ">";
+                string += " or <@" + admin + ">";
             });
             message.reply("Hi! I have no functioning commands here. If you want to talk about me contact " + string + ". Or to add me visit " + config.botlink)
         }
