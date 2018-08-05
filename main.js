@@ -56,6 +56,21 @@ client.on('guildDelete', async guild => {
     sendtoadmin(`Disconnected from a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
 });
 
+//this is crappy coding, yes I know. This is temporary. I am currently reworking the framework for all my bots.
+
+function getuser(id) {
+    return new Promise(async function (resolve, reject) {
+        console.log("getting user: " + id.toString());
+        var x = await client.fetchUser(id.toString());
+        resolve(x);
+    })
+}
+
+async function sendmessagetouser(id, message) {
+    var user = await getuser(id);
+    user.send(message);
+}
+
 var admins;
 
 function getadminuser() {
@@ -95,7 +110,10 @@ function setuplink(target) {
             }, function (err, xhr, body) {
                 if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
                 if (req.body.username == undefined && req.body.content == "") {
-                    sendtoadmin("Being triggered without data by: " + target);
+                    var serverid = sql.getserverbyhook(target);
+                    var server = sql.getserver(serverid);
+                    sendtoadmin("Being triggered without data by: **" + server.servername + "** owned by <@" + server.owner + ">");
+                    sendmessagetouser(server.owner, "Hello, a webhook that you have created is being used but no data is being sent through it. If this occurs more often one of the admins may contact you to resolve this. You are recieving this message due to Discord being quite strict on their rules about how you are allowed to use a webhook. \n Webhook targeted: "+target+"")
                 }
                 return res.send("Successfully posted data to webhook.");
             })
@@ -129,7 +147,7 @@ client.on('message', async message => {
                 const user = message.author;
 
                 var out = await sql.getserver(await message.guild.id)
-                if (out == false) {//id,servername,members,prefix,owner
+                if (out == null) {//id,servername,members,prefix,owner
                     console.log("Creation of record: " + await sql.create(message.guild.id, message.guild.name, message.guild.memberCount, defaultprefix, await message.guild.ownerID, message.guild.region));
                 }
                 else {

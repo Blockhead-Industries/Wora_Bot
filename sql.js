@@ -17,14 +17,14 @@ connection.connect(function (err) {
 });
 
 async function checkexist(id, fn) {
-    var returned;
+    var returned = null;;
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
-            returned = false;
             //console.log("Checking for " + id);
-            result.forEach(function (e, err) {
-                returned = true;
-            });
+            returned = result;
+            if (result.length == 0) {
+                returned = null;
+            }
             resolve(returned);
         });
     });
@@ -92,6 +92,20 @@ function checkprefix(id) {
     });
 }
 
+function checkprefixbyhook(id) {
+    var returned;
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT serverid FROM webhooks WHERE webhooks.webhook = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
+            returned = "";
+            //console.log("Checking for " + id);
+            result.forEach(function (e, err) {
+                returned = e.serverid;
+            });
+            resolve(returned);
+        });
+    });
+}
+
 function checkvalue(id, valuetocheck) {
     var returned;
     return new Promise(function (resolve, reject) {
@@ -122,6 +136,11 @@ function deleterecord(id) {
 module.exports = {
     getserver: async function (id) {
         var boola = await checkexist(id);
+        return boola;
+    },
+
+    getserverbyhook: async function (id) {
+        var boola = await checkexistbyhook(id);
         return boola;
     },
 
