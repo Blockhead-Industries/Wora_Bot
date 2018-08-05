@@ -109,7 +109,7 @@ function setuplink(target) {
                 json: req.body
             }, function (err, xhr, body) {
                 if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
-                if (req.body.username == undefined && req.body.content == "") {
+                if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
                     var serverid = sql.getserverbyhook(target);
                     var server = sql.getserver(serverid);
                     sendtoadmin("Being triggered without data by: **" + server.servername + "** owned by <@" + server.owner + ">");
