@@ -30,6 +30,20 @@ async function checkexist(id, fn) {
     });
 }
 
+function checkexistbyhook(id) {
+    var returned;
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT serverid FROM webhooks WHERE webhooks.webhook = '" + mysql.escape(id) + "'", async function ExistCheck(err, result, fields) {
+            returned = "";
+            //console.log("Checking for " + id);
+            result.forEach(function (e, err) {
+                returned = e.serverid;
+            });
+            resolve(returned);
+        });
+    });
+}
+
 async function createserver(id, servername, members, prefix, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
