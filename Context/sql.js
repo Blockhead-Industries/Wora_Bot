@@ -1,11 +1,11 @@
 ﻿var mysql = require('mysql');
-const config = require("./config.json");
+const config = require("../settings/config.json");
 
 var connection = mysql.createConnection({
-    host: config.SQLHost,
-    user: config.SQLUsername,
-    password: config.SQLPassword,
-    database: config.SQLDatabase
+    host: config.SQL.SQLHost,
+    user: config.SQL.SQLUsername,
+    password: config.SQL.SQLPassword,
+    database: config.SQL.SQLDatabase
 });
 
 connection.connect(function (err) {

@@ -1,5 +1,5 @@
-const config = require("./config.json");
-const sql = require("./sql.js");
+const config = require("./Settings/config.json");
+const sql = require("./Context/sql.js");
 
 const OS = require('os');
 
