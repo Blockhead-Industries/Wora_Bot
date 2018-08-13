@@ -1,0 +1,29 @@
+{
+  "token": {
+    "discord": ""
+  },
+
+  "default": {
+    "prefix": "!"
+  },
+
+  "info": {
+    "version": "1.2",
+    "description": "",
+    "github": "https://github.com/EnessenE/wora",
+    "link": ""
+  },
+
+  "settings": {
+    "specialguilds": [ ],
+    "admins": [ "" ]
+  },
+
+
+  "SQL": {
+    "SQLHost": "",
+    "SQLDatabase": "",
+    "SQLUsername": "",
+    "SQLPassword": ""
+  }
+}
