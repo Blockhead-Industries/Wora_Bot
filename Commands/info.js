@@ -27,11 +27,11 @@ module.exports = {
                         "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
                         + "Running on: " + client.guilds.size + " servers\n"
                         + "Running for: " + client.users.size + " online users\n" + "\n"
-                        + "Github: " + config.github
+                        + "Github: " + config.info.github
                 },
                 {
-                    name: "Version " + config.botver,
-                    value: config.versioninfo
+                    name: "Version " + config.info.version,
+                    value: config.info.description
                 },
                 {
                     name: "Back-end info",
@@ -42,7 +42,7 @@ module.exports = {
                 timestamp: new Date(),
                 footer: {
                     icon_url: client.user.avatarURL,
-                    text: config.botlink
+                    text: config.info.link
                 }
             }
         });
@@ -116,7 +116,7 @@ module.exports = {
                     timestamp: new Date(),
                     footer: {
                         icon_url: client.user.avatarURL,
-                        text: config.botlink
+                        text: config.info.link
                     }
                 }
             };

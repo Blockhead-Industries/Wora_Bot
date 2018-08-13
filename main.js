@@ -14,7 +14,7 @@ webhookcommands.init(sql, config);
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const discordtoken = config.discordtoken;
+const discordtoken = config.token.discord;
 
 const express = require('express')
 const request = require('request')
@@ -24,10 +24,10 @@ let app = express()
 app.use(express.json());
 
 
-var defaultprefix = config.defaultprefix;
-var botver = config.botver;
-var versioninfo = config.versioninfo;
-var discordbotlink = config.botlink;
+var defaultprefix = config.default.prefix;
+var botver = config.info.version;
+var versioninfo = config.info.description;
+var discordbotlink = config.info.link;
 var statusbot = defaultprefix + "help | " + discordbotlink;
 var commands = [
     "help", "List of commands.",
