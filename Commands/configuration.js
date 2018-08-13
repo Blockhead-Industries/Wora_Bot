@@ -24,17 +24,24 @@ module.exports = {
     },
 
     setprefix: async function (client, message, parameters) {
-        if (await PermCheck(message, message.author, gotroleid) == true) {
-            if (parameters.length != 0) {
+        if (await PermCheck(message, message.author, gotroleid) === true) {
+            if (parameters.length !== 0) {
                 //prefixset[message.guild.id] = parameters[0];
-                sql.setprefix(message.guild.id, parameters[0])
-                message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
+                var result = await sql.setprefix(message.guild.id, parameters[0]);
+                console.log(result);
+                if (result == true) {
+                    message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
+                }
+                else {
+                    message.reply("Something went wrong while changing your prefix!");
+                }
             }
         }
         else {
-            message.reply(notallowed("prefix", message.guild.id))
+            message.reply(notallowed("prefix", message.guild.id));
         }
     },
+
     setbotcontrol: async function (message) {
         if (message.member.hasPermission("ADMINISTRATOR")) {
             if (parameters[0] != ("" || undefined)) {
