@@ -58,7 +58,7 @@ client.on('guildDelete', async guild => {
 
 //this is crappy coding, yes I know. This is temporary. I am currently reworking the framework for all my bots.
 
-function getuser(id) {
+async function getuser(id) {
     return new Promise(async function (resolve, reject) {
         console.log("getting user: " + id.toString());
         var x = await client.fetchUser(id.toString());
@@ -73,15 +73,14 @@ async function sendmessagetouser(id, message) {
 
 var admins;
 
-function getadminuser() {
+async function getadminuser() {
     return new Promise(async function (resolve, reject) {
         var result = [];
-        config.admins.forEach(async function (admin) {
-            console.log("getting admin user: " + admin.toString());
-            var x = await client.fetchUser(admin.toString());
+        config.settings.admins.forEach(async function (admin) {
+            var x = await getuser(admin);
             result.push(x);
         });
-        resolve(result);
+        resolve(await result);
     })
 }
 
