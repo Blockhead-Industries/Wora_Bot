@@ -36,7 +36,7 @@ module.exports = {
                     mes.author.send(k)
                 }
                 else {
-                    message.reply("That is not a valid url!")
+                    message.reply("That is not a valid discord webhook url!")
                 }
             }
             else {
