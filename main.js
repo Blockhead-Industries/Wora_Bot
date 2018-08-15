@@ -16,14 +16,6 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const discordtoken = config.token.discord;
 
-const express = require('express')
-const request = require('request')
-const bodyParser = require('body-parser')
-
-let app = express()
-app.use(express.json());
-
-
 var defaultprefix = config.default.prefix;
 var botver = config.info.version;
 var versioninfo = config.info.description;
