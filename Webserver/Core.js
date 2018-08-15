@@ -17,7 +17,10 @@ function setuplink(target) {
                 method: "POST",
                 json: req.body
             }, function (err, xhr, body) {
-                if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) return res.send("Discord API returned an error.");
+                if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) {
+                    return res.send("Discord API returned an error.");
+                }
+
                 if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
                     var serverid = sql.getserverbyhook(target);
                     var server = sql.getserver(serverid);
@@ -38,3 +41,4 @@ function setuplink(target) {
 app.listen(3000, function () {
     console.log('Server is running on port 3000.');
 })
+
