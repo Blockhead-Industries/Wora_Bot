@@ -11,11 +11,12 @@
     "version": "1.2",
     "description": "",
     "github": "https://github.com/EnessenE/wora",
-    "link": ""
+    "link": "",
+    "legacylink": ""
   },
 
   "settings": {
-    "specialguilds": [ ],
+    "specialguilds": [],
     "admins": [ "" ]
   },
 
