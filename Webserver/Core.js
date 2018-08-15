@@ -21,8 +21,7 @@ function setuplink(target) {
                 if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
                     var serverid = sql.getserverbyhook(target);
                     var server = sql.getserver(serverid);
-                    sendtoadmin("Being triggered without data by: **" + server.servername + "** owned by <@" + server.owner + ">");
-                    sendmessagetouser(server.owner, "Hello, a webhook that you have created is being used but no data is being sent through it. If this occurs more often one of the admins may contact you to resolve this. You are recieving this message due to Discord being quite strict on their rules about how you are allowed to use a webhook. \n Webhook targeted: " + target + "")
+
                 }
                 return res.send("Successfully posted data to webhook.");
             })
