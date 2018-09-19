@@ -38,7 +38,7 @@ function setuplink(target) {
     return ("http://" + discordbotlink + ":3000/" + inbound)
 }
 
-app.listen(3000, function () {
+app.listen(config.webhook.port, function () {
     console.log('Server is running on port 3000.');
 })
 
