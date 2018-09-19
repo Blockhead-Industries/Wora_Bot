@@ -3,10 +3,10 @@
 module.exports = class Server {
 
     constructor(id, name, owner, webhooks) {
-        this.id = id; // server id
-        this.name = name; //name 
-        this.owner = owner; //user object from discord.js
-        this.webhooks = webhooks; //array
+        this._id = id; // server id
+        this._name = name; //name 
+        this._owner = owner; //user object from discord.js
+        this._webhooks = webhooks; //array
     }
 
     get id() {

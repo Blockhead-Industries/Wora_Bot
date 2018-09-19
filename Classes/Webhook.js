@@ -1,11 +1,10 @@
 ﻿'use strict';
 
 module.exports = class Webhook {
-
     constructor(id, url, server) {
-        this.id = id; //webhook id
-        this.url = url; //url from this
-        this.server = server; //Server class
+        this._id = id; //webhook id
+        this._url = url; //url from this
+        this._server = server; //Server class
     }
 
     get id() {
