@@ -1,4 +1,7 @@
-﻿var mysql = require('mysql');
+﻿const Webhook = require('../Classes/Webhook.js');
+const Server = require('../Classes/Server.js');
+
+var mysql = require('mysql');
 const config = require("../settings/config.json");
 
 var connection = mysql.createConnection({
@@ -158,10 +161,9 @@ function GetAllWebhooks() {
             var webhooks = new Array();
 
             result.forEach(function (item, err) {
-                console.log(item.webhook);
-                //Currently we set id to 0 due to database not having webhooks id's
+                //Currently we the set id to 0 due to database not having webhooks id's
                 var webhook = new Webhook(0, item.webhook,new Server(item.serverid));
-                
+                webhooks.push(webhook);
             });
             console.log("all data posted");
             resolve(webhooks);
