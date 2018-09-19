@@ -1,17 +1,17 @@
-const express = require('express')
-const request = require('request')
-const bodyParser = require('body-parser')
+const express = require('express');
+const request = require('request');
+const bodyParser = require('body-parser');
 
 let app = express()
 app.use(express.json());
 
 function setuplink(target) {
-    console.log("Setup for: " + target)
-    var inbound = target.replace("https://discordapp.com/api/webhooks/", "")
+    console.log("Setup for: " + target);
+    var inbound = target.replace("https://discordapp.com/api/webhooks/", "");
     app.post("/" + inbound, function (req, res) {
         try {
             console.log(target + " - DATA: " + req.body.username + " - " + req.body.content);
-            let data = req.body
+            let data = req.body;
             request({
                 url: target,
                 method: "POST",
@@ -27,18 +27,25 @@ function setuplink(target) {
 
                 }
                 return res.send("Successfully posted data to webhook.");
-            })
+            };
 
         }
         catch (err) {
             console.log(err)
         }
-    })
+    });
     console.log("Setup finished for: " + target)
-    return ("http://" + discordbotlink + ":3000/" + inbound)
+    return ("http://" + discordbotlink + ":" + config.webhook.port + "/" + inbound);
 }
 
 app.listen(config.webhook.port, function () {
     console.log('Server is running on port 3000.');
 })
 
+async function start() {
+    var webhooks = await sql.GetAllWebhooks();
+    webhooks.forEach(function (item, err) {
+        setuplink((Webhook)item.url));
+    });
+    sendtoadmin("Finished setup for " + links.length.toString() + " webhooks.")
+}
