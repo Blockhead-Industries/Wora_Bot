@@ -2,9 +2,9 @@
 
     constructor(id, source, target, server) {
         this.id = id;
-        this.source = source;
-        this.target = target;
-        this.server = server;
+        this.source = source; //url from discord
+        this.target = target; //url from this
+        this.server = server; //Server class
     }
 
     get id() {
