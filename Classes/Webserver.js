@@ -1,5 +1,7 @@
 ﻿const express = require('express');
 const request = require('request');
+let app = express();
+app.use(express.json());
 const bodyParser = require('body-parser');
 
 'use strict';
@@ -7,12 +9,11 @@ const bodyParser = require('body-parser');
 module.exports = class Webserver {
     constructor(servername, port, legacyservername) {
         console.log("Starting webserver: " + servername + " on port " + port);
-        let app = express();
-        app.use(express.json());
 
-        this.servername = servername; //servername
-        this.port = port; //port to run webserver on
-        this.legacyservername = legacyservername; //legacyservername 
+
+        this._servername = servername; //servername
+        this._port = port; //port to run webserver on
+        this._legacyservername = legacyservername; //legacyservername 
 
         app.listen(port, function () {
             console.log('Server is running on port ' + port + '.');
@@ -22,7 +23,7 @@ module.exports = class Webserver {
 
     setuplink(webhook) {
         console.log("Setup for: " + webhook);
-        var inbound = webhook.cleanurl;
+        var inbound = webhook.url;
         app.post("/" + inbound, function (req, res) {
             try {
                 console.log(webhook.url + " - DATA: " + req.body.username + " - " + req.body.content);
@@ -49,7 +50,7 @@ module.exports = class Webserver {
                 console.log(err)
             }
         });
-        console.log("Setup finished for: " + webhook.url)
-        return ("http://" + discordbotlink + ":" + port + "/" + inbound);
+        console.log("Setup finished for: " + webhook.url);
+        return ("http://" + this._servername + ":" + this._port + "/" + inbound);
     }
 }
