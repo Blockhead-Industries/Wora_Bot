@@ -2,10 +2,10 @@
 const config = require("../settings/config.json");
 
 var connection = mysql.createConnection({
-    host: config.SQL.SQLHost,
-    user: config.SQL.SQLUsername,
-    password: config.SQL.SQLPassword,
-    database: config.SQL.SQLDatabase
+    host: config.sql.host,
+    user: config.sql.username,
+    password: config.sql.password,
+    database: config.sql.database
 });
 
 connection.connect(function (err) {
@@ -17,7 +17,7 @@ connection.connect(function (err) {
 });
 
 async function checkexist(id, fn) {
-    var returned = null;;
+    var returned = null;
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             //console.log("Checking for " + id);
@@ -147,6 +147,28 @@ function deleterecord(id) {
     });
 }
 
+function GetAllWebhooks() {
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT * FROM webhooks;", async function ExistCheck(err, result) {
+            if (err) {
+                console.log(err);
+                resolve("Couldn't retrieve record!");
+            }
+
+            var webhooks = new Array();
+
+            result.forEach(function (item, err) {
+                console.log(item.webhook);
+                //Currently we set id to 0 due to database not having webhooks id's
+                var webhook = new Webhook(0, item.webhook,new Server(item.serverid));
+                
+            });
+            console.log("all data posted");
+            resolve(webhooks);
+        });
+    });
+}
+
 module.exports = {
     getserver: async function (id) {
         var boola = await checkexist(id);
@@ -228,16 +250,6 @@ module.exports = {
     },
 
     getsetup: async function () {
-        var returned;
-        return new Promise(function (resolve, reject) {
-            connection.query("SELECT * FROM webhooks;", async function ExistCheck(err, result) {
-                if (err) {
-                    console.log(err);
-                    resolve("Couldn't retrieve record!");
-                }
-                resolve(result);
-            });
-        });
-
-    },
+        return await GetAllWebhooks();
+    }
 };
