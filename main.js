@@ -1,3 +1,5 @@
+const Webhook = require('./Classes/Webhook.js');
+const Server = require('./Classes/Server.js');
 const Webserver = require('./Classes/Webserver.js');
 
 const config = require("./Settings/config.json");
@@ -324,9 +326,12 @@ function PermCheck(message, user, roleid) {
 async function start() {
     var webserver = new Webserver(config.webserver.link, config.webserver.port, config.webserver.legacylink);
     var webhooks = await sql.getsetup();
+
     webhooks.forEach(function (item, err) {
         webserver.setuplink(item);
+        console.log("Succesfully setup: " + item.url);
     });
+
     sendtoadmin("Finished setup for " + webhooks.length.toString() + " webhooks.");
 }
 
