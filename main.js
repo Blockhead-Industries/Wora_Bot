@@ -48,8 +48,6 @@ client.on('guildDelete', async guild => {
     sendtoadmin(`Disconnected from a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
 });
 
-//this is crappy coding, yes I know. This is temporary. I am currently reworking the framework for all my bots.
-
 async function getuser(id) {
     return new Promise(async function (resolve, reject) {
         console.log("getting user: " + id.toString());
