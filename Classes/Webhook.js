@@ -1,9 +1,8 @@
 ﻿class Webhook {
 
-    constructor(id, source, target, server) {
-        this.id = id;
-        this.source = source; //url from discord
-        this.target = target; //url from this
+    constructor(id, url, server) {
+        this.id = id; //webhook id
+        this.url = url; //url from this
         this.server = server; //Server class
     }
 
@@ -13,24 +12,25 @@
 
     set id(value) {
 
-        this._name = value;
-    }
-
-    get source() {
-        return this._source;
-    }
-
-    set source(value) {
-        this._source = value;
+        this._id = value;
     }
 
     get server() {
-        return this._id;
+        return this._server;
     }
 
     set server(value) {
 
         this._server = value;
+    }
+
+    get url() {
+        return this._url;
+    }
+
+    set url(value) {
+
+        this._url = value;
     }
 
 }
