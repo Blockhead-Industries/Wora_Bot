@@ -33,4 +33,13 @@
         this._url = value;
     }
 
+    get discordurl() {
+        return this._url;
+    }
+
+    get cleanurl() {
+        var inbound = _url.replace("https://discordapp.com/api/webhooks/", "");
+        return inbound;
+    }
+
 }
