@@ -1,4 +1,6 @@
-﻿class Webhook {
+﻿'use strict';
+
+module.exports = class Webhook {
 
     constructor(id, url, server) {
         this.id = id; //webhook id

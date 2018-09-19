@@ -1,4 +1,6 @@
-﻿class Server {
+﻿'use strict';
+
+module.exports = class Server {
 
     constructor(id, name, owner, webhooks) {
         this.id = id; // server id
