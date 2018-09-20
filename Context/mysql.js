@@ -1,7 +1,9 @@
 ﻿const Webhook = require('../Classes/Webhook.js');
 const Server = require('../Classes/Server.js');
 
+var async = require("async");
 var mysql = require('mysql');
+
 const config = require("../settings/config.json");
 
 var connection = mysql.createConnection({
@@ -150,22 +152,48 @@ function deleterecord(id) {
     });
 }
 
+function GetServerByID(id) {
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT * FROM servers where serverid = " + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+            if (err) {
+                console.log(err);
+                resolve(undefined);
+            }
+            var server;
+            result.forEach(function (item, err) {
+                server = new Server(item.serverid, item.servername, item.owner);
+            });
+            resolve(server);
+        });
+    });
+}
+
 function GetAllWebhooks() {
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM webhooks;", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
-                resolve("Couldn't retrieve record!");
+                resolve(undefined);
             }
+
 
             var webhooks = new Array();
 
-            result.forEach(function (item, err) {
+            for (var i = 0; i < result.length; i++) {
+                var item = result[i];
                 //Currently we the set id to 0 due to database not having webhooks id's
-                var webhook = new Webhook(0, item.webhook,new Server(item.serverid));
-                webhooks.push(webhook);
-            });
-            console.log("all data posted");
+                var server = await GetServerByID(item.serverid);
+
+                var webhook = new Webhook(0, item.webhook, server);
+
+                if (webhook.server == undefined) {
+                    console.log("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
+                }
+                else {
+                    webhooks.push(webhook);
+                }
+            };
+
             resolve(webhooks);
         });
     });
