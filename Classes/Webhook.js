@@ -35,7 +35,7 @@ module.exports = class Webhook {
     }
 
     get cleanurl() {
-        var inbound = _url.replace("https://discordapp.com/api/webhooks/", "");
+        var inbound = this._url.replace("https://discordapp.com/api/webhooks/", "");
         return inbound;
     }
 
