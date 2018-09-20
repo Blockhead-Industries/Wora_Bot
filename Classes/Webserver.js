@@ -22,7 +22,8 @@ module.exports = class Webserver {
     }
 
     setuplink(webhook) {
-        console.log("Setup for: " + webhook);
+        console.log("Setting up webhook: " + webhook.id);
+        var result;
         var inbound = webhook.url;
         app.post("/" + inbound, function (req, res) {
             try {
@@ -44,13 +45,13 @@ module.exports = class Webserver {
                     }
                     return res.send("Successfully posted data to webhook.");
                 });
-
+                result = ("http://" + this._servername + ":" + this._port + "/" + inbound);
             }
             catch (err) {
-                console.log(err)
+                console.log(err);
+                result = false;
             }
         });
-        console.log("Setup finished for: " + webhook.url);
-        return ("http://" + this._servername + ":" + this._port + "/" + inbound);
+        return result;
     }
 }
