@@ -34,4 +34,11 @@ module.exports = class Server {
         this._webhooks = value;
     }
 
+    get owner() {
+        return this._owner;
+    }
+
+    set owner(value) {
+        this._owner = value;
+    }
 }
