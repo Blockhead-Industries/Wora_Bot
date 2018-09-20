@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/EnessenE/Wora#readme",
   "dependencies": {
+    "async": "^2.6.1",
     "body-parser": "^1.18.2",
     "discord.js": "^11.3.2",
     "express": "^4.16.3",
