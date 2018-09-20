@@ -24,34 +24,28 @@ module.exports = class Webserver {
     setuplink(webhook) {
         console.log("Setting up webhook: " + webhook.id);
         var result;
-        var inbound = webhook.url;
+        var inbound = webhook.cleanurl;
         app.post("/" + inbound, function (req, res) {
-            try {
-                console.log(webhook.url + " - DATA: " + req.body.username + " - " + req.body.content);
-                let data = req.body;
-                request({
-                    url: webhook.url,
-                    method: "POST",
-                    json: req.body
-                }, function (err, xhr, body) {
-                    if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) {
-                        return res.send("Discord API returned an error.");
-                    }
+            console.log(webhook.url + " - DATA: " + req.body.username + " - " + req.body.content);
+            let data = req.body;
+            request({
+                url: webhook.url,
+                method: "POST",
+                json: req.body
+            }, function (err, xhr, body) {
+                if (xhr != undefined && xhr.statusCode != undefined && !(xhr.statusCode === 204)) {
+                    return res.send("Discord API returned an error.");
+                }
 
-                    if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
-                        var serverid = sql.getserverbyhook(webhook.url);
-                        var server = sql.getserver(serverid);
+                if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
+                    var serverid = sql.getserverbyhook(webhook.url);
+                    var server = sql.getserver(serverid);
 
-                    }
-                    return res.send("Successfully posted data to webhook.");
-                });
-                result = ("http://" + this._servername + ":" + this._port + "/" + inbound);
-            }
-            catch (err) {
-                console.log(err);
-                result = false;
-            }
+                }
+                return res.send("Successfully posted data to webhook.");
+            });
         });
+        result = "http://" + this._servername + ":" + this._port + "/" + inbound;
         return result;
     }
 }
