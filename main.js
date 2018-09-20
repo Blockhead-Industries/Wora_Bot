@@ -14,6 +14,7 @@ configcommands.init(sql, config);
 infocommands.init(sql, config, OS);
 webhookcommands.init(sql, config);
 
+var webserver;
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -133,34 +134,56 @@ client.on('message', async message => {
                             webhookcommands.deletelink(client, message);
                         }
                         else if (input === prefix + "link") {
-                            if (await PermCheck(message, message.author, gotroleid) == true) {
-                                if (parameters.length != 0) {
-                                    if (parameters[0].includes("https://discordapp.com/api/webhooks/")) {
-                                        message.reply("I will send messages in private, execute commands here. I deleted your message to ensure our safety!")
-                                        var mes = message;
-                                        message.delete()
-                                        mes.author.send("Give me a moment. I am setting up the redirect for " + parameters[0])
-                                        var tick = await sql.createwebhook(mes.guild.id, parameters[0])
+                            try {
+                                if (await PermCheck(message, message.author, gotroleid) == true) {
+                                    if (parameters.length != 0) {
+                                        if (!parameters[0].includes("https://discordapp.com/api/webhooks/")) {
+                                            message.reply("That is not a valid url!");
+                                            return;
+                                        }
+                                    }
+                                    else {
+                                        message.reply("I need a discord webhook url!");
+                                        return;
+                                    }
+
+                                    var mes = message;
+                                    try {
+                                        message.delete();
+                                    }
+                                    catch (err) {
+                                        message.reply("I couldn't delete your message. Please remove it yourself.\n Error: " + err.message);
+                                    }
+
+                                    message.reply("I will send messages in private, execute commands here.");
+
+                                    mes.author.send("Give me a moment. I am setting up the redirect for " + parameters[0]);
+
+                                    var link = await webserver.setuplink(new Webhook("NEWWEBHOOK", parameters[0], new Server(message.guild.id)));
+                                    if (link != undefined) {
+                                        var tick = await sql.createwebhook(mes.guild.id, parameters[0]);
+
                                         if (tick != "Couldn't create record!") {
-                                            var link = await setuplink(parameters[0])
-                                            mes.author.send("Finished and completed setup. You can use this webhook: " + link)
+                                            mes.author.send("Finished and completed setup. You can use this webhook: " + link);
                                             sendtoadmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
                                         }
                                         else {
                                             message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
                                         }
-                                        mes.reply("Completed, have fun using it!")
+                                        mes.reply("Completed, have fun using it!");
                                     }
                                     else {
-                                        message.reply("That is not a valid url!")
+                                        message.author.send("An error occurred setting up your webhook");
                                     }
+
                                 }
                                 else {
-                                    message.reply("I need a discord webhook url!")
+                                    message.reply(notallowed("link", message.guild.id));
                                 }
                             }
-                            else {
-                                message.reply(notallowed("link", message.guild.id))
+                            catch (err) {
+                                console.log(err.message);
+                                message.reply("An error occured while setting this up for you. Please try again. \n Error: " + err.message);
                             }
                         }
                         else if (input === prefix + "links") {
@@ -324,14 +347,14 @@ function PermCheck(message, user, roleid) {
 }
 
 async function start() {
-    var webserver = new Webserver(config.webserver.link, config.webserver.port, config.webserver.legacylink);
+    webserver = new Webserver(config.webserver.link, config.webserver.port, config.webserver.legacylink);
     var webhooks = await sql.getsetup();
 
     webhooks.forEach(function (item, err) {
         webserver.setuplink(item);
         console.log("Succesfully setup: " + item.url);
+        sendmessagetouser(item.server.owner, "One of your webhooks has been started: " + item.url);
     });
-
     sendtoadmin("Finished setup for " + webhooks.length.toString() + " webhooks.");
 }
 
