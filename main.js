@@ -54,7 +54,7 @@ client.on('guildDelete', async guild => {
 
 
 client.on('message', async message => {
-    var message = await message;
+
     if (message.author != client.user) {
         if (message.channel.type === 'dm') { //dm
             var string = "";
