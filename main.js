@@ -61,7 +61,7 @@ client.on('message', async message => {
             config.admins.forEach(async function (admin) {
                 string += " or <@" + admin + ">";
             });
-            message.reply("Hi! I have no functioning commands here. If you want to talk about me contact " + string + ". Or to add me visit " + config.botlink)
+            message.reply("Hi! I have no functioning commands here. If you want to talk about me contact" + string + ". Or to add me visit " + config.botlink)
         }
 
         else {
