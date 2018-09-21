@@ -45,18 +45,18 @@ client.on('ready', async () => {
 });
 
 client.on('guildCreate', async guild => {
-    sendtoadmin(`Connected to a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
+    sendtoadmin(`Connected to a discord: ${guild.name} - ${guild.memberCount - 1} members`);
 });
 
 client.on('guildDelete', async guild => {
-    sendtoadmin(`Disconnected from a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
+    sendtoadmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount - 1} members`);
 });
 
 
 client.on('message', async message => {
 
     if (message.author != client.user) {
-        if (message.channel.type === 'dm') { //dm
+        if (message.channel.type === 'dm') {
             var string = "";
             config.admins.forEach(async function (admin) {
                 string += " or <@" + admin + ">";
@@ -268,7 +268,7 @@ client.on('message', async message => {
             }
         }
     }
-}
+    }
 );
 
 function GuildSpecificCommands(message) {
