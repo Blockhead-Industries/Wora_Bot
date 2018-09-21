@@ -137,7 +137,7 @@ client.on('message', async message => {
                             try {
                                 if (await PermCheck(message, message.author, gotroleid) == true) {
                                     if (parameters.length != 0) {
-                                        if (!parameters[0].includes("https://discordapp.com/api/webhooks/")) {
+                                        if (!parameters[0].includes(config.costum.discordwebhookurl)) {
                                             message.reply("That is not a valid url!");
                                             return;
                                         }

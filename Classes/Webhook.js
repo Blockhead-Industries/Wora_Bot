@@ -1,5 +1,7 @@
 ﻿'use strict';
 
+const config = require("../Settings/config.json");
+
 module.exports = class Webhook {
     constructor(id, url, server) {
         this._id = id; //webhook id
@@ -35,7 +37,7 @@ module.exports = class Webhook {
     }
 
     get cleanurl() {
-        var inbound = this._url.replace("https://discordapp.com/api/webhooks/", "");
+        var inbound = this._url.replace(config.costum.discordwebhookurl, "");
         return inbound;
     }
 
