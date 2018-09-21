@@ -10,7 +10,6 @@ module.exports = class Webserver {
     constructor(servername, port, legacyservername) {
         console.log("Starting webserver: " + servername + " on port " + port);
 
-
         this._servername = servername; //servername
         this._port = port; //port to run webserver on
         this._legacyservername = legacyservername; //legacyservername 
