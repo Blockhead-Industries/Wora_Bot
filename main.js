@@ -37,10 +37,33 @@ var commands = [
 ];
 
 function initialize_misc() {
+    var admins = [];
+
+    async function SendToAdmin(message) {
+        if (admins == undefined) {
+            admins = await GetAdmins();
+        }
+        admins.forEach(function (admin) {
+            admin.send(message.toString());
+        });
+    }
+
+    async function GetAdmins() {
+        return new Promise(function (resolve, reject) {
+            config.settings.admins.forEach(async function (id) {
+                var x = await client.fetchUser(id.toString());
+                admins.push(x);
+            });
+            resolve(admins);
+        });
+    }
+
     client.on('ready', async () => {
+        await GetAdmins();
+
         console.log(`Logged in as ${client.user.tag}!`);
-        await sendtoadmin("I have been started on: " + OS.hostname() + " - " + botver);
-        await sendtoadmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
+        SendToAdmin(`I have been started on: ${OS.hostname()} - ${config.info.version}`);
+        SendToAdmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
         client.user.setActivity(statusbot);
     });
 
@@ -311,7 +334,7 @@ function PermCheck(message, user, roleid) {
     })
 }
 
-async function start() {
+async function Start_Webserver() {
     webserver = new Webserver(config.webserver.link, config.webserver.port, config.webserver.legacylink);
     var webhooks = await sql.getsetup();
 
@@ -323,15 +346,23 @@ async function start() {
     sendtoadmin("Finished setup for " + webhooks.length.toString() + " webhooks.");
 }
 
-initialize_misc();
-initialize_main();
+async function Start_Bot() {
+    await initialize_misc();
+    await client.login(config.token.discord);
+    console.log("Bot has started");
+    //initialize_main();
 
-client.login(discordtoken);
+    // StartWebserver();
 
-setTimeout(function () {
-    start();
-}, 3000);
+}
+
+Start_Bot();
 
 
 
-console.log("Bot has started");
+//setTimeout(function () {
+//    StartWebserver();
+//}, 3000);
+
+
+
