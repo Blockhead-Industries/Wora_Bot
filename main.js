@@ -52,43 +52,6 @@ client.on('guildDelete', async guild => {
     sendtoadmin(`Disconnected from a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
 });
 
-async function getuser(id) {
-    return new Promise(async function (resolve, reject) {
-        console.log("getting user: " + id.toString());
-        var x = await client.fetchUser(id.toString());
-        resolve(x);
-    })
-}
-
-async function sendmessagetouser(id, message) {
-    var user = await getuser(id);
-    user.send(message);
-}
-
-var admins;
-
-async function getadminuser() {
-    return new Promise(async function (resolve, reject) {
-        var result = [];
-        config.settings.admins.forEach(async function (admin) {
-            var x = await getuser(admin);
-            result.push(x);
-        });
-        resolve(await result);
-    })
-}
-
-async function sendtoadmin(message) {
-    console.log(message);
-    if (admins == undefined) {
-        admins = await getadminuser();
-    }
-    console.log("Sending message: " + message.toString());
-    admins.forEach(function (admin) {
-        admin.send(message.toString());
-    });
-}
-
 
 client.on('message', async message => {
     var message = await message;
