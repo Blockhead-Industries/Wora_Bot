@@ -3,7 +3,7 @@ const Server = require('./Classes/Server.js');
 const Webserver = require('./Classes/Webserver.js');
 
 const config = require("./Settings/config.json");
-const sql = require("./Context/" + config.sql.type + ".js");
+const sql = require("./Repo/Repository.js");
 const OS = require('os');
 
 const configcommands = require("./Commands/configuration.js");
@@ -19,7 +19,6 @@ var admins = [];
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const discordtoken = config.token.discord;
 
 var statusbot = config.default.prefix + "help | " + config.info.link;
 
