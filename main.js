@@ -3,16 +3,16 @@ const Server = require('./Classes/Server.js');
 const Webserver = require('./Classes/Webserver.js');
 
 const config = require("./Settings/config.json");
-const sql = require("./Repo/Repository.js");
+const repo = require("./Repo/Repository.js");
 const OS = require('os');
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/info.js");
 const webhookcommands = require("./Commands/webhook.js");
 
-configcommands.init(sql, config);
-infocommands.init(sql, config, OS);
-webhookcommands.init(sql, config);
+configcommands.init(repo, config);
+infocommands.init(repo, config, OS);
+webhookcommands.init(repo, config);
 
 var webserver;
 var admins = [];
@@ -93,15 +93,13 @@ function initialize_main() {
                 if (message.guild.available) {
                     const user = message.author;
 
-                    var out = await sql.getserver(await message.guild.id)
+                    var out = await repo.GetWebhooksFromServer(await message.guild.id);
                     if (out == null) {//id,servername,members,prefix,owner
-                        print("Creation of record: " + await sql.create(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, await message.guild.ownerID, message.guild.region));
+                        print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region),true);
                     }
                     else {
-                        sql.update(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region) //async
+                        repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
                     }
-
-                    const permmember = await message.channel.permissionsFor(client.user);
                     try {
                         if (user.tag !== client.user.tag) {
                             print("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
@@ -110,8 +108,8 @@ function initialize_main() {
                             var input = messageParts[0].toLowerCase();
                             var parameters = messageParts.splice(1, messageParts.length);
 
-                            var prefix = await sql.getprefix(message.guild.id);
-                            var roleid = await sql.getvalue(message.guild.id, "PermRole");
+                            var prefix = await repo.GetPrefix(message.guild.id);
+                            var roleid = await repo.GetValue(message.guild.id, "PermRole");
 
                             if (input === prefix + "ping") {
                                 infocommands.ping(client, message);
@@ -150,7 +148,7 @@ function initialize_main() {
 
                                         var link = await webserver.setuplink(new Webhook("NEWWEBHOOK", parameters[0], new Server(message.guild.id)));
                                         if (link != undefined) {
-                                            var tick = await sql.createwebhook(mes.guild.id, parameters[0]);
+                                            var tick = await repo.CreateWebhook(mes.guild.id, parameters[0]);
 
                                             if (tick != "Couldn't create record!") {
                                                 mes.author.send("Finished and completed setup. You can use this webhook: " + link);
@@ -177,9 +175,9 @@ function initialize_main() {
                             }
                             else if (input === prefix + "links") {
                                 if (await PermCheck(message, message.author, roleid) == true) {
-                                    message.reply("I will send messages in private, execute commands here.")
-                                    var links = await sql.getallwebhooks(message.guild.id)
-                                    message.author.send("All redirects for " + message.guild.name + ":")
+                                    message.reply("I will send messages in private, execute commands here.");
+                                    var links = await repo.GetWebhooksFromServer(message.guild.id);
+                                    message.author.send("All redirects for " + message.guild.name + ":");
                                     for (var i = 0; i < links.length; i++) {
                                         var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + config.info.link + ":3000/")
 
@@ -338,7 +336,7 @@ function PermCheck(message, user, roleid) {
 
 async function Start_Webserver() {
     webserver = new Webserver(config.webserver.link, config.webserver.port, config.webserver.legacylink);
-    var webhooks = await sql.getsetup();
+    var webhooks = await repo.GetAllWebhooks();
 
     webhooks.forEach(function (item, err) {
         webserver.setuplink(item);
