@@ -45,7 +45,7 @@ function initialize_misc() {
         });
 function print(message, override) {
     if (config.costum.debugging|| override) {
-        console.log(message);
+        console.log(`MAIN.JS: ${message}`);
     }
 }
 
