@@ -68,11 +68,11 @@ function initialize_misc() {
     });
 
     client.on('guildCreate', async guild => {
-        sendtoadmin(`Connected to a discord: ${guild.name} - ${guild.memberCount - 1} members`);
+        sendtoadmin(`Connected to a discord: ${guild.name} - ${guild.memberCount} members`);
     });
 
     client.on('guildDelete', async guild => {
-        sendtoadmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount - 1} members`);
+        sendtoadmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount} members`);
     });
 }
 
