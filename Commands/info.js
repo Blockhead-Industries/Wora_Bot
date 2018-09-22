@@ -125,5 +125,49 @@ module.exports = {
             console.log(err);
             message.reply("Couldn't make an embedded post for you. Sorry!");
         }
+    },
+
+    serverinfo: function (client, message) {
+        // print(message.guild.roles);
+        var roleoutput = "";
+        message.guild.roles.forEach(function (element) {
+            roleoutput = roleoutput + ", " + element.name;
+        });
+        roleoutput = roleoutput.substr(2, roleoutput.length);
+        roleoutput = roleoutput.replace("@everyone", "everyone");
+        message.reply({
+            embed: {
+                color: 3447003,
+                author: {
+                    name: "Server information for " + message.guild.name,
+                    icon_url: message.guild.iconURL
+                },
+                fields: [{
+                    name: "Generic",
+                    value: "**ID:** " + message.guild.id + "\n"
+                        + "**Members:** " + message.guild.memberCount + "\n"
+                        + "**Owner:** " + message.guild.owner.user.tag + " - " + message.guild.ownerID + "\n"
+                        + "**Region:** " + message.guild.region + "\n"
+                        + "**Created at:** " + message.guild.createdAt + "\n"
+                        + "**Verification level:** " + message.guild.verificationLevel + "\n"
+                        + "**AFK timeout:** " + message.guild.afkTimeout / 60 + " minute(s)\n"
+                        + "**Icon:** " + message.guild.iconURL + "\n"
+                },
+                {
+                    name: "Roles",
+                    value: roleoutput
+                },
+                {
+                    name: "Wora Configuration",
+                    value: "**Prefix:** " + await repo.GetPrefix(message.guild.id) + "\n"
+                },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    icon_url: client.user.avatarURL,
+                    text: config.info.link
+                }
+            }
+        });
     }
 }

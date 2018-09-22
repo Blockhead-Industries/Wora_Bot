@@ -43,7 +43,7 @@ async function SendToAdmin(message) {
 }
 
 function print(message, override) {
-    if (config.costum.debugging|| override) {
+    if (config.costum.debugging || override) {
         console.log(`MAIN.JS: ${message}`);
     }
 }
@@ -62,7 +62,7 @@ function initialize_misc() {
     client.on('ready', async () => {
         await GetAdmins();
 
-        print(`Logged in as ${client.user.tag}!`,true);
+        print(`Logged in as ${client.user.tag}!`, true);
         SendToAdmin(`I have been started on: ${OS.hostname()} - ${config.info.version}`);
         SendToAdmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
         client.user.setActivity(statusbot);
@@ -95,7 +95,7 @@ function initialize_main() {
 
                     var out = await repo.GetWebhooksFromServer(await message.guild.id);
                     if (out == null) {//id,servername,members,prefix,owner
-                        print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region),true);
+                        print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region), true);
                     }
                     else {
                         repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
@@ -192,51 +192,11 @@ function initialize_main() {
                                 configcommands.setprefix(client, message, parameters);
                             }
                             else if (input === prefix + "serverinfo") {
-                                // print(message.guild.roles);
-                                roleoutput = "";
-                                message.guild.roles.forEach(function (element) {
-                                    roleoutput = roleoutput + ", " + element.name;
-                                });
-                                roleoutput = roleoutput.substr(2, roleoutput.length);
-                                roleoutput = roleoutput.replace("@everyone", "everyone");
-                                message.reply({
-                                    embed: {
-                                        color: 3447003,
-                                        author: {
-                                            name: "Server information for " + message.guild.name,
-                                            icon_url: message.guild.iconURL
-                                        },
-                                        fields: [{
-                                            name: "Generic",
-                                            value: "**ID:** " + message.guild.id + "\n"
-                                                + "**Members:** " + message.guild.memberCount + "\n"
-                                                + "**Owner:** " + message.guild.owner.user.tag + " - " + message.guild.ownerID + "\n"
-                                                + "**Region:** " + message.guild.region + "\n"
-                                                + "**Created at:** " + message.guild.createdAt + "\n"
-                                                + "**Verification level:** " + message.guild.verificationLevel + "\n"
-                                                + "**AFK timeout:** " + message.guild.afkTimeout / 60 + " minute(s)\n"
-                                                + "**Icon:** " + message.guild.iconURL + "\n"
-                                        },
-                                        {
-                                            name: "Roles",
-                                            value: roleoutput
-                                        },
-                                        {
-                                            name: "Wora Configuration",
-                                            value: "**Prefix:** " + prefix + "\n"
-                                        },
-                                        ],
-                                        timestamp: new Date(),
-                                        footer: {
-                                            icon_url: client.user.avatarURL,
-                                            text: config.info.link
-                                        }
-                                    }
-                                });
+                                infocommands.serverinfo(client, message);
                             }
                             else if (input === prefix + "help") {
                                 helparray = "";
-                                var list = 0
+                                var list = 0;
                                 for (i = 0; i < commands.length / 2; i++) {
                                     helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
                                     list += 2;
@@ -275,7 +235,7 @@ function initialize_main() {
                                 message.reply(messagearray);
                             }
                             else if (input === prefix + "botcontrol") {
-                                configcommands.setbotcontrol(message)
+                                configcommands.setbotcontrol(message);
                             }
                             else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
                                 infocommands.userinfo(client, message);
@@ -348,7 +308,7 @@ async function Start_Webserver() {
 async function Start_Bot() {
     await initialize_misc();
     await client.login(config.token.discord);
-    print("Bot has started",true);
+    print("Bot has started", true);
     initialize_main();
 
     Start_Webserver();
