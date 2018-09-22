@@ -168,6 +168,18 @@ function GetServerByID(id) {
     });
 }
 
+function DeleteWebhooksOnServer(id) {
+    return new Promise(function (resolve, reject) {
+        connection.query(`delete from webhooks where serverid = ${id};`, async function ExistCheck(err, result) {
+            if (err) {
+                console.log(err);
+                resolve(false);
+            }
+            resolve(true);
+        });
+    });
+}
+
 function GetAllWebhooks() {
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM webhooks;", async function ExistCheck(err, result) {
@@ -181,13 +193,20 @@ function GetAllWebhooks() {
 
             for (var i = 0; i < result.length; i++) {
                 var item = result[i];
-                //Currently we the set id to 0 due to database not having webhooks id's
                 var server = await GetServerByID(item.serverid);
 
-                var webhook = new Webhook(0, item.webhook, server);
+                var webhook = new Webhook(item.id, item.webhook, server);
 
                 if (webhook.server == undefined) {
                     console.log("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
+                    var deleteresult = await DeleteWebhooksOnServer(item.serverid);
+
+                    if (deleteresult) {
+                        console.log("Removed webhooks on server ID: " + item.serverid);
+                    }
+                    else {
+                        console.log("Failed at removing all webhooks from server ID " + item.serverid);
+                    }
                 }
                 else {
                     webhooks.push(webhook);
