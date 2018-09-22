@@ -37,9 +37,7 @@ module.exports = class Webserver {
                 }
 
                 if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
-                    var serverid = sql.getserverbyhook(webhook.url);
-                    var server = sql.getserver(serverid);
-
+                    webhook.server.user.send("Warning, a message send by one of your webhooks is causing issues. \n ");
                 }
                 return res.send("Successfully posted data to webhook.");
             });
