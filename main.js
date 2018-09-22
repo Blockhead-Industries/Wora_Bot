@@ -20,11 +20,8 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const discordtoken = config.token.discord;
 
-var defaultprefix = config.default.prefix;
-var botver = config.info.version;
-var versioninfo = config.info.description;
-var discordbotlink = config.info.link;
-var statusbot = defaultprefix + "help | " + discordbotlink;
+var statusbot = config.default.prefix + "help | " + config.info.link;
+
 var commands = [
     "help", "List of commands.",
     "prefix [new prefix]", "Set a new prefix for the bot.",
@@ -94,7 +91,7 @@ function initialize_main() {
 
                     var out = await sql.getserver(await message.guild.id)
                     if (out == null) {//id,servername,members,prefix,owner
-                        console.log("Creation of record: " + await sql.create(message.guild.id, message.guild.name, message.guild.memberCount, defaultprefix, await message.guild.ownerID, message.guild.region));
+                        console.log("Creation of record: " + await sql.create(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, await message.guild.ownerID, message.guild.region));
                     }
                     else {
                         sql.update(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region) //async
@@ -105,11 +102,12 @@ function initialize_main() {
                         if (user.tag !== client.user.tag) {
                             console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
 
-                            messageParts = message.content.split(' ');
-                            input = messageParts[0].toLowerCase();
-                            parameters = messageParts.splice(1, messageParts.length);
-                            prefix = await sql.getprefix(message.guild.id);
-                            gotroleid = await sql.getvalue(message.guild.id, "PermRole");
+                            var messageParts = message.content.split(' ');
+                            var input = messageParts[0].toLowerCase();
+                            var parameters = messageParts.splice(1, messageParts.length);
+
+                            var prefix = await sql.getprefix(message.guild.id);
+                            var roleid = await sql.getvalue(message.guild.id, "PermRole");
 
                             if (input === prefix + "ping") {
                                 infocommands.ping(client, message);
@@ -122,7 +120,7 @@ function initialize_main() {
                             }
                             else if (input === prefix + "link") {
                                 try {
-                                    if (await PermCheck(message, message.author, gotroleid) == true) {
+                                    if (await PermCheck(message, message.author, roleid) == true) {
                                         if (parameters.length != 0) {
                                             if (!parameters[0].includes(config.costum.discordwebhookurl)) {
                                                 message.reply("That is not a valid url!");
@@ -174,12 +172,12 @@ function initialize_main() {
                                 }
                             }
                             else if (input === prefix + "links") {
-                                if (await PermCheck(message, message.author, gotroleid) == true) {
+                                if (await PermCheck(message, message.author, roleid) == true) {
                                     message.reply("I will send messages in private, execute commands here.")
                                     var links = await sql.getallwebhooks(message.guild.id)
                                     message.author.send("All redirects for " + message.guild.name + ":")
                                     for (var i = 0; i < links.length; i++) {
-                                        var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + discordbotlink + ":3000/")
+                                        var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + config.info.link + ":3000/")
 
                                         message.author.send(links[i].webhook + "\nto\n" + inbound);
                                     }
@@ -229,7 +227,7 @@ function initialize_main() {
                                         timestamp: new Date(),
                                         footer: {
                                             icon_url: client.user.avatarURL,
-                                            text: discordbotlink
+                                            text: config.info.link
                                         }
                                     }
                                 });
@@ -257,7 +255,7 @@ function initialize_main() {
                                         timestamp: new Date(),
                                         footer: {
                                             icon_url: client.user.avatarURL,
-                                            text: discordbotlink
+                                            text: config.info.link
                                         }
                                     }
                                 };
@@ -286,7 +284,7 @@ function initialize_main() {
                         }
                     }
                     catch (error) {
-                        console.log("Error: " + error)
+                        console.log("Error: " + error);
                     }
 
                 }
