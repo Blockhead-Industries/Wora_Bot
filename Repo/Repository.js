@@ -19,6 +19,9 @@ module.exports = {
         return await db.UpdateServer(serverid, servername, members, owner, region);
     },
 
+    GetValue: async function (id, valuetocheck) {
+        return await db.GetValue(id, valuetocheck);
+    },
     UpdateValue: async function (serverid, valuetoupdate, newvalue) {
         return await db.UpdateValue(serverid, valuetoupdate, newvalue);
     },

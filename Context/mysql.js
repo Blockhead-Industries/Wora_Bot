@@ -93,7 +93,6 @@ module.exports = {
     },
 
     UpdateValue: async function (id, toset, newval) {
-        var returned;
         return new Promise(function (resolve, reject) {
             try {
                 connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
@@ -110,6 +109,18 @@ module.exports = {
         });
     },
 
+    GetValue: async function(id, valuetocheck) {
+        return new Promise(function (resolve, reject) {
+            connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
+                returned = "";
+                //console.log("Checking for " + id);
+                result.forEach(function (e, err) {
+                    returned = e[valuetocheck];
+                });
+                resolve(returned);
+            });
+        });
+    }
 
     GetPrefix: async function (id) {
         var returned;
