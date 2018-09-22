@@ -354,7 +354,7 @@ async function Start_Bot() {
     print("Bot has started",true);
     //initialize_main();
 
-    // StartWebserver();
+    Start_Webserver();
 
 }
 
