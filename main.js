@@ -70,24 +70,24 @@ function initialize_misc() {
     });
 
     client.on('guildCreate', async guild => {
-        sendtoadmin(`Connected to a discord: ${guild.name} - ${guild.memberCount} members`);
+        SendToAdmin(`Connected to a discord: ${guild.name} - ${guild.memberCount} members`);
     });
 
     client.on('guildDelete', async guild => {
-        sendtoadmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount} members`);
+        SendToAdmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount} members`);
     });
 }
 
 function initialize_main() {
     var contacts = "";
-    config.admins.forEach(async function (admin) {
+    config.settings.admins.forEach(async function (admin) {
         contacts += " or <@" + admin + ">";
     });
 
     client.on('message', async message => {
         if (message.author != client.user) {
             if (message.channel.type === 'dm') {
-                message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${contacts}. Or to add me visit ${config.botlink}`);
+                message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${contacts}. Or to add me visit ${config.info.invitelink}`);
             }
 
             else {
@@ -155,7 +155,7 @@ function initialize_main() {
 
                                             if (tick != "Couldn't create record!") {
                                                 mes.author.send("Finished and completed setup. You can use this webhook: " + link);
-                                                sendtoadmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
+                                                SendToAdmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
                                             }
                                             else {
                                                 message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
@@ -352,7 +352,7 @@ async function Start_Bot() {
     await initialize_misc();
     await client.login(config.token.discord);
     print("Bot has started",true);
-    //initialize_main();
+    initialize_main();
 
     Start_Webserver();
 
