@@ -43,7 +43,11 @@ function initialize_misc() {
         admins.forEach(function (admin) {
             admin.send(message.toString());
         });
+function print(message, override) {
+    if (config.costum.debugging|| override) {
+        console.log(message);
     }
+}
 
     async function GetAdmins() {
         return new Promise(function (resolve, reject) {
@@ -91,7 +95,7 @@ function initialize_main() {
 
                     var out = await sql.getserver(await message.guild.id)
                     if (out == null) {//id,servername,members,prefix,owner
-                        console.log("Creation of record: " + await sql.create(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, await message.guild.ownerID, message.guild.region));
+                        print("Creation of record: " + await sql.create(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, await message.guild.ownerID, message.guild.region));
                     }
                     else {
                         sql.update(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region) //async
@@ -100,7 +104,7 @@ function initialize_main() {
                     const permmember = await message.channel.permissionsFor(client.user);
                     try {
                         if (user.tag !== client.user.tag) {
-                            console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
+                            print("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
 
                             var messageParts = message.content.split(' ');
                             var input = messageParts[0].toLowerCase();
@@ -167,7 +171,7 @@ function initialize_main() {
                                     }
                                 }
                                 catch (err) {
-                                    console.log(err.message);
+                                    print(err.message);
                                     message.reply("An error occured while setting this up for you. Please try again. \n Error: " + err.message);
                                 }
                             }
@@ -190,7 +194,7 @@ function initialize_main() {
                                 configcommands.setprefix(client, message, parameters);
                             }
                             else if (input === prefix + "serverinfo") {
-                                // console.log(message.guild.roles);
+                                // print(message.guild.roles);
                                 roleoutput = "";
                                 message.guild.roles.forEach(function (element) {
                                     roleoutput = roleoutput + ", " + element.name;
@@ -284,7 +288,7 @@ function initialize_main() {
                         }
                     }
                     catch (error) {
-                        console.log("Error: " + error);
+                        print("Error: " + error);
                     }
 
                 }
@@ -347,7 +351,7 @@ async function Start_Webserver() {
 async function Start_Bot() {
     await initialize_misc();
     await client.login(config.token.discord);
-    console.log("Bot has started");
+    print("Bot has started",true);
     //initialize_main();
 
     // StartWebserver();
