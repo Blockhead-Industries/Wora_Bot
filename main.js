@@ -78,15 +78,15 @@ function print(message, override) {
 }
 
 function initialize_main() {
-    var admins = "";
+    var contacts = "";
     config.admins.forEach(async function (admin) {
-        admins += " or <@" + admin + ">";
+        contacts += " or <@" + admin + ">";
     });
 
     client.on('message', async message => {
         if (message.author != client.user) {
             if (message.channel.type === 'dm') {
-                message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${admins}. Or to add me visit ${config.botlink}`);
+                message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${contacts}. Or to add me visit ${config.botlink}`);
             }
 
             else {
