@@ -1,10 +1,10 @@
-﻿var sql;
+﻿var repo;
 var config;
 var OS;
 
 module.exports = {
     init: function (s, c, s) {
-        sql = s;
+        repo = s;
         config = c;
         OS = s;
     },
