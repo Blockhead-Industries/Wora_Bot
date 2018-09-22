@@ -49,6 +49,7 @@ function print(message, override) {
     }
 }
 
+function initialize_misc() {
     async function GetAdmins() {
         return new Promise(function (resolve, reject) {
             config.settings.admins.forEach(async function (id) {
@@ -62,7 +63,7 @@ function print(message, override) {
     client.on('ready', async () => {
         await GetAdmins();
 
-        console.log(`Logged in as ${client.user.tag}!`);
+        print(`Logged in as ${client.user.tag}!`,true);
         SendToAdmin(`I have been started on: ${OS.hostname()} - ${config.info.version}`);
         SendToAdmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
         client.user.setActivity(statusbot);
@@ -342,10 +343,9 @@ async function Start_Webserver() {
 
     webhooks.forEach(function (item, err) {
         webserver.setuplink(item);
-        console.log("Succesfully setup: " + item.url);
-        sendmessagetouser(item.server.owner, "One of your webhooks has been started: " + item.url);
     });
-    sendtoadmin("Finished setup for " + webhooks.length.toString() + " webhooks.");
+
+    SendToAdmin("Finished setup for " + webhooks.length.toString() + " webhooks.");
 }
 
 async function Start_Bot() {
