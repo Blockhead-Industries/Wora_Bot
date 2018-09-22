@@ -120,7 +120,7 @@ module.exports = {
                 resolve(returned);
             });
         });
-    }
+    },
 
     GetPrefix: async function (id) {
         var returned;
