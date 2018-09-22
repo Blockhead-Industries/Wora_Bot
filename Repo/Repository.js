@@ -20,19 +20,19 @@ module.exports = {
     },
 
     UpdateValue: async function (serverid, valuetoupdate, newvalue) {
-        return await update(serverid, valuetoupdate, newvalue);
+        return await db.UpdateValue(serverid, valuetoupdate, newvalue);
     },
 
     GetPrefix: async function (serverid) {
-        return db.GetPrefix(serverid);
+        return await db.GetPrefix(serverid);
     },
 
     SetPrefix: async function (serverid, prefix) {
-        return await update(serverid, "prefix", prefix);
+        return await db.UpdateValue(serverid, "prefix", prefix);
     },
 
     DeleteWebhook: async function (deleteid) {
-        return await deleterecord(deleteid);
+        return await db.DeleteWebhook(deleteid);
     },
 
     CreateWebhook: async function (serverid, webhook) {
