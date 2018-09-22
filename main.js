@@ -15,6 +15,7 @@ infocommands.init(sql, config, OS);
 webhookcommands.init(sql, config);
 
 var webserver;
+var admins = [];
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -33,16 +34,15 @@ var commands = [
     "deletelink", "deletes the webhook.",
 ];
 
-function initialize_misc() {
-    var admins = [];
+async function SendToAdmin(message) {
+    if (admins == undefined) {
+        admins = await GetAdmins();
+    }
+    admins.forEach(function (admin) {
+        admin.send(message.toString());
+    });
+}
 
-    async function SendToAdmin(message) {
-        if (admins == undefined) {
-            admins = await GetAdmins();
-        }
-        admins.forEach(function (admin) {
-            admin.send(message.toString());
-        });
 function print(message, override) {
     if (config.costum.debugging|| override) {
         console.log(`MAIN.JS: ${message}`);
