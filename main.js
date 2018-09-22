@@ -77,15 +77,15 @@ function initialize_misc() {
 }
 
 function initialize_main() {
-    client.on('message', async message => {
+    var admins = "";
+    config.admins.forEach(async function (admin) {
+        admins += " or <@" + admin + ">";
+    });
 
+    client.on('message', async message => {
         if (message.author != client.user) {
             if (message.channel.type === 'dm') {
-                var string = "";
-                config.admins.forEach(async function (admin) {
-                    string += " or <@" + admin + ">";
-                });
-                message.reply("Hi! I have no functioning commands here. If you want to talk about me contact" + string + ". Or to add me visit " + config.botlink)
+                message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${admins}. Or to add me visit ${config.botlink}`);
             }
 
             else {
