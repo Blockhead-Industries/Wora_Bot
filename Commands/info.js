@@ -30,13 +30,12 @@ module.exports = {
                         + "Github: " + config.info.github
                 },
                 {
-                    name: "Version " + config.info.version,
-                    value: config.info.description
+                    name: `Version ${config.info.version}`,
+                    value: (`${config.info.description}` || "No info for this version.")
                 },
                 {
                     name: "Back-end info",
-                    value:
-                        "Current server: " + OS.hostname() + "\n"
+                    value: `Current server: ${OS.hostname()}`
                 }
                 ],
                 timestamp: new Date(),
