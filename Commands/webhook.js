@@ -1,4 +1,4 @@
-﻿var sql;
+﻿var repo;
 var config;
 
 function PermCheck(message, user, roleid) {
@@ -19,7 +19,7 @@ function PermCheck(message, user, roleid) {
 
 module.exports = {
     init: function (s, c) {
-        sql = s;
+        repo = s;
         config = c;
     },
 
@@ -31,7 +31,7 @@ module.exports = {
                     var mes = message;
                     message.delete()
                     mes.author.send("Deleting " + parameters[0])
-                    var k = await sql.delete(parameters[0])
+                    var k = await repo.DeleteWebhook(parameters[0])
                     message.reply(k)
                     mes.author.send(k)
                 }
