@@ -1,4 +1,4 @@
-﻿var sql;
+﻿var repo;
 var config;
 
 function PermCheck(message, user, roleid) {
@@ -19,7 +19,7 @@ function PermCheck(message, user, roleid) {
 
 module.exports = {
     init: function (s, c) {
-        sql = s;
+        repo = s;
         config = c;
     },
 
@@ -27,7 +27,7 @@ module.exports = {
         if (await PermCheck(message, message.author, gotroleid) === true) {
             if (parameters.length !== 0) {
                 //prefixset[message.guild.id] = parameters[0];
-                var result = await sql.setprefix(message.guild.id, parameters[0]);
+                var result = await repo.SetPrefix(message.guild.id, parameters[0]);
                 console.log(result);
                 if (result == true) {
                     message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
@@ -61,7 +61,7 @@ module.exports = {
                     }
                 });
                 if (found == true) {
-                    if (await sql.updatevalue(message.guild.id, "PermRole", roleid)) {
+                    if (await repo.UpdateValue(message.guild.id, "PermRole", roleid)) {
                         message.reply("I have set the role " + rolename + " to control me.");
                     }
                     else {
