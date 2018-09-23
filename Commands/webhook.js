@@ -152,5 +152,40 @@ module.exports = {
             print(err.message);
             message.reply("An error occured while setting this up for you. Please try again. \n Error: " + err.message);
         }
+    },
+
+    getalllinks: async function (client, message, roleid) {
+        if ((await PermCheck(message, message.author, roleid)) === true) {
+            message.reply("I will send messages in private, execute commands here.");
+            var links = await repo.GetWebhooksFromServer(message.guild.id);
+
+            var data = [];
+
+            data.title = `All redirects for ${message.guild.name}`;
+            data.description = `Here we show all the redirects that you have setup for this discord. \n The ID shown is used for troubleshooting with the bot owner. This is mostly irrelevant for you.`;
+            data.timestamp = `Requested at: ${new Date()}`;
+            data = new Discord.RichEmbed(data);
+
+            for (var i = 0; i < links.length; i++) {
+                var webhook = links[i];
+                var info = `${webhook.url}\n Redirected to \n ${webhook.usedurl}`;
+                data.addField(`Webhook - ID: ${webhook.id}`, info, true);
+            }
+
+
+            message.author.send(data);
+
+
+            //var links = await repo.GetWebhooksFromServer(message.guild.id);
+            //message.author.send("All redirects for " + message.guild.name + ":");
+            //for (var i = 0; i < links.length; i++) {
+            //    var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + config.info.link + ":3000/")
+
+            //    message.author.send(links[i].webhook + "\nto\n" + inbound);
+            //}
+        }
+        else {
+            message.reply(notallowed("links", message.guild.id))
+        }
     }
 }
