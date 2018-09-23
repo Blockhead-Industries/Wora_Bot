@@ -238,7 +238,7 @@ function initialize_main() {
                                 configcommands.setbotcontrol(message);
                             }
                             else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
-                                infocommands.userinfo(client, message);
+                                infocommands.userinfo(client, message, parameters);
                             }
                             else {
                                 GuildSpecificCommands(message);
@@ -311,7 +311,7 @@ async function Start_Bot() {
     print("Bot has started", true);
     initialize_main();
 
-    Start_Webserver();
+    //  Start_Webserver();
 
 }
 
