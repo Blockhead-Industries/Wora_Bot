@@ -13,51 +13,74 @@ var connection = mysql.createConnection({
     database: config.sql.database
 });
 
+function print(message, override) {
+    if (config.costum.debugging || override) {
+        console.log(`MYSQL.JS: ${message}`);
+    }
+}
+
 connection.connect(function (err) {
     if (!err) {
-        console.log("Database is connected");
+        print("Database is connected", true);
     } else {
-        console.log("Error connecting database: " + err);
+        print("Error connecting database: " + err, true);
     }
 });
 
-function GetServerByID(id) {
+
+
+function GetServerByID(id, client) {
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM servers where serverid = " + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
-                console.log(err);
+                print(err);
                 resolve(undefined);
             }
             var server;
-            result.forEach(function (item, err) {
+            for (var i = 0; i < result.length; i++) {
+                var item = result[i];
                 server = new Server(item.serverid, item.servername, item.owner);
-            });
+                if (client !== undefined) {
+                    server.owner = await client.fetchUser(item.owner);
+                }
+            };
             resolve(server);
         });
     });
 }
 
-module.exports = {
-    GetWebhooksFromServerID: async function (id, fn) {
-        var returned = null;
-        return new Promise(function (resolve, reject) {
-            connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
-                //console.log("Checking for " + id);
-                returned = result;
-                if (result.length == 0) {
-                    returned = null;
-                }
-                resolve(returned);
-            });
-        });
-    },
+async function PutTogether_Webhook(item, client) {
+    return new Promise(async function (resolve, reject) {
 
+        var server = await GetServerByID(item.serverid, client);
+
+        var webhook = new Webhook(item.id, item.webhook, server);
+
+        if (webhook.server == undefined) {
+            print("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
+            var deleteresult = await DeleteWebhooksOnServer(item.serverid);
+
+            if (deleteresult) {
+                print("Removed webhooks on server ID: " + item.serverid);
+            }
+            else {
+                print("Failed at removing all webhooks from server ID " + item.serverid);
+            }
+            resolve(undefined);
+        }
+        else {
+            resolve(webhook);
+        }
+    });
+}
+
+module.exports = {
     GetServerFromWebhook: async function (id) {
         var returned;
         return new Promise(function (resolve, reject) {
             connection.query("SELECT serverid FROM webhooks WHERE webhooks.webhook = '" + mysql.escape(id) + "'", async function ExistCheck(err, result, fields) {
                 returned = "";
-                //console.log("Checking for " + id);
+                //print("Checking for " + id);
                 result.forEach(function (e, err) {
                     returned = e.serverid;
                 });
@@ -71,7 +94,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(servername) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region) + ");", async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve("Couldn't create record!");
                 }
                 resolve("Successfully added");
@@ -84,7 +107,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             connection.query("UPDATE `servers` SET `servername`=" + mysql.escape(servername) + ", `members`=" + mysql.escape(members.toString()) + ", `owner`=" + mysql.escape(owner) + ", `region`=" + mysql.escape(region) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve("Couldn't create record!");
                 }
                 resolve("Successfully added");
@@ -97,7 +120,7 @@ module.exports = {
             try {
                 connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                     if (err) {
-                        console.log(err);
+                        print(err);
                         resolve("Couldn't create record!");
                     }
                     resolve(true);
@@ -109,11 +132,11 @@ module.exports = {
         });
     },
 
-    GetValue: async function(id, valuetocheck) {
+    GetValue: async function (id, valuetocheck) {
         return new Promise(function (resolve, reject) {
             connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
                 returned = "";
-                //console.log("Checking for " + id);
+                //print("Checking for " + id);
                 result.forEach(function (e, err) {
                     returned = e[valuetocheck];
                 });
@@ -127,7 +150,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
                 returned = "";
-                //console.log("Checking for " + id);
+                //print("Checking for " + id);
                 result.forEach(function (e, err) {
                     returned = e.prefix;
                 });
@@ -140,9 +163,9 @@ module.exports = {
     DeleteWebhook: async function (id) {
         var returned;
         return new Promise(function (resolve, reject) {
-            connection.query("DELETE FROM webhooks WHERE webhook=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+            connection.query("DELETE FROM webhooks WHERE id=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve("Couldn't delete record!");
                 }
                 resolve("Successfully deleted");
@@ -154,7 +177,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             connection.query("INSERT INTO webhooks (`webhook`, `serverid`) VALUES (" + mysql.escape(webhook) + "," + mysql.escape(id) + ");", async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve("Couldn't create record!");
                 }
                 resolve("Successfully added");
@@ -166,10 +189,20 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             connection.query("SELECT * FROM webhooks WHERE serverid=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve("Couldn't retrieve record!");
                 }
-                resolve(result);
+                var webhooks = new Array();
+
+                for (var i = 0; i < result.length; i++) {
+                    var item = result[i];
+                    var webhook = await PutTogether_Webhook(item);
+                    if (webhook !== undefined) {
+                        webhooks.push(webhook);
+                    }
+                };
+
+                resolve(webhooks);
             });
         });
     },
@@ -178,7 +211,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             connection.query(`delete from webhooks where serverid = ${id};`, async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve(false);
                 }
                 resolve(true);
@@ -186,41 +219,44 @@ module.exports = {
         });
     },
 
-    GetAllWebhooks: async function () {
+    GetAllWebhooks: async function (client) {
         return new Promise(function (resolve, reject) {
             connection.query("SELECT * FROM webhooks;", async function ExistCheck(err, result) {
                 if (err) {
-                    console.log(err);
+                    print(err);
                     resolve(undefined);
                 }
-
-
                 var webhooks = new Array();
 
                 for (var i = 0; i < result.length; i++) {
                     var item = result[i];
-                    var server = await GetServerByID(item.serverid);
+                    var webhook = await PutTogether_Webhook(item, client);
 
-                    var webhook = new Webhook(item.id, item.webhook, server);
+                    if (webhook !== undefined) {
+                        var pass = true;
 
-                    if (webhook.server == undefined) {
-                        console.log("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
-                        var deleteresult = await DeleteWebhooksOnServer(item.serverid);
+                        for (var x = 0; x < webhooks.length; x++) {
+                            var registered_webhook = webhooks[x];
 
-                        if (deleteresult) {
-                            console.log("Removed webhooks on server ID: " + item.serverid);
+                            if (registered_webhook.url === webhook.url) {
+
+                                webhook.server.owner.send(`I found a webhook duplicate webhook in the database that belongs to one of your servers. I am now deleting the duplicate one, the original will still be functional. You may ignore this message if it doesn't reoccur.`);
+
+                                print(`DOUBLE WEBHOOK FOUND WITH ID: ${webhook.id}. DELETING`, true);
+
+                                pass = false;
+                                module.exports.DeleteWebhook(webhook.id);
+                            }
                         }
-                        else {
-                            console.log("Failed at removing all webhooks from server ID " + item.serverid);
+
+                        if (pass) {
+                            webhooks.push(webhook);
                         }
-                    }
-                    else {
-                        webhooks.push(webhook);
                     }
                 };
 
                 resolve(webhooks);
             });
         });
-    }
+    },
 }

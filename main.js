@@ -239,7 +239,7 @@ function PermCheck(message, user, roleid) {
 
 async function Start_Webserver() {
     webserver = new Webserver(config.webserver.link, config.webserver.port, config.webserver.legacylink);
-    var webhooks = await repo.GetAllWebhooks();
+    var webhooks = await repo.GetAllWebhooks(client);
 
     webhooks.forEach(function (item, err) {
         webserver.setuplink(item);
