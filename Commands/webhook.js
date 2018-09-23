@@ -9,6 +9,10 @@ var config;
 var print;
 var SendToAdmin;
 
+function notallowed(command, id) {
+    return "You are not allowed to use the " + prefix + command + " command."
+}
+
 function PermCheck(message, user, roleid) {
     var val = false;
     return new Promise(function (resolve, reject) {
@@ -52,13 +56,32 @@ module.exports = {
         if (await PermCheck(message, message.author, roleid) == true) {
             if (parameters.length != 0) {
                 if (parameters[0].includes("https://discordapp.com/api/webhooks/")) {
-                    message.reply("I will send messages in private, execute commands here. I deleted your message to ensure our safety!")
-                    var mes = message;
-                    message.delete();
-                    mes.author.send("Deleting " + parameters[0]);
-                    var k = await repo.DeleteWebhook(parameters[0]);
-                    message.reply(k);
-                    mes.author.send(k);
+                    try {
+                        message.delete();
+                    }
+                    catch (err) {
+                        message.reply("I couldn't delete your message. Please remove it yourself.\n Error: " + err.message);
+                    }
+                    
+                    message.reply("I will send messages in private, execute commands here. I deleted your message to ensure our safety!");
+
+                    message.author.send("Looking for webhook...");
+                    try {
+                        var webhook = await repo.GetWebhook(parameters[0]);
+                        if (webhook !== undefined) {
+                            message.author.send(`Found the webhook. It has been registered under ID: ${webhook.id}. \n It will now be deleted`);
+                            var k = await repo.DeleteWebhook(webhook.id);
+                            if (k) {
+                                message.author.send(`Webhook has succesfully been deleted.`);
+                            }
+                            else {
+                                message.author.send("Something went wrong deleting your webhook. Please try again. If the problem persists please contact one of the bot owners.");
+                            }
+                        }
+                    }
+                    catch(error){
+                        message.author.send(`Something went wrong while I tried to delete your webhook. \n Error: ${error.message}`);
+                    }
                 }
                 else {
                     message.reply("That is not a valid discord webhook url!");
