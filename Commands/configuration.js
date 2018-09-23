@@ -14,7 +14,18 @@ function PermCheck(message, user, roleid) {
             val = true;
         }
         resolve(val);
-    })
+    });
+}
+
+function IsAdmin(id) {
+    return new Promise(function (resolve, reject) {
+        config.settings.admins.forEach(async function (x) {
+            if (x == id) {
+                resolve(true);
+            }
+        });
+        resolve(false);
+    });
 }
 
 module.exports = {
@@ -42,8 +53,8 @@ module.exports = {
         }
     },
 
-        if (message.member.hasPermission("ADMINISTRATOR")) {
     setbotcontrol: async function (message, parameters) {
+        if (message.member.hasPermission("ADMINISTRATOR") || IsAdmin(message.author.id)) {
             if (parameters[0] != ("" || undefined)) {
                 bigpara = "";
                 for (var i = 0; i < parameters.length; i++) {
