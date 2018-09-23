@@ -10,10 +10,6 @@ const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/info.js");
 const webhookcommands = require("./Commands/webhook.js");
 
-configcommands.init(repo, config);
-infocommands.init(repo, config, OS);
-webhookcommands.init(repo, config);
-
 var webserver;
 var admins = [];
 
@@ -30,7 +26,9 @@ var commands = [
     "serverinfo", "Server information",
     "link [webhook]", "Sets a webhook to redirect. I do not setup discord webhooks myself. Thats your problem.",
     "links", "Shows all webhooks.",
-    "deletelink", "deletes the webhook.",
+    "deletelink/delete [webhook]", "Deletes the webhook.",
+    "userinfo @user", "Information about a user",
+    "me", "Information about you"
 ];
 
 async function SendToAdmin(message) {
@@ -38,9 +36,13 @@ async function SendToAdmin(message) {
         admins = await GetAdmins();
     }
     admins.forEach(function (admin) {
-        admin.send(message.toString());
+        admin.send(message);
     });
 }
+
+configcommands.init(repo, config);
+infocommands.init(repo, config, OS);
+webhookcommands.init(repo, config, print, SendToAdmin);
 
 function print(message, override) {
     if (config.costum.debugging || override) {
@@ -110,6 +112,7 @@ function initialize_main() {
 
                             var prefix = await repo.GetPrefix(message.guild.id);
                             var roleid = await repo.GetValue(message.guild.id, "PermRole");
+
                             if (input.charAt(0) == prefix) {
                                 var command = input.substr(1);
                                 if (command === prefix + "ping") {
@@ -118,61 +121,11 @@ function initialize_main() {
                                 else if (command === "you") {
                                     infocommands.botinfo(client, message);
                                 }
-                                else if (command === "deletelink") {
-                                    webhookcommands.deletelink(client, message);
+                                else if (command === "delete" || command === "deletelink") {
+                                    webhookcommands.deletelink(client, message, parameters, roleid);
                                 }
                                 else if (command === "link") {
-                                    try {
-                                        if (await PermCheck(message, message.author, roleid) == true) {
-                                            if (parameters.length != 0) {
-                                                if (!parameters[0].includes(config.costum.discordwebhookurl)) {
-                                                    message.reply("That is not a valid url!");
-                                                    return;
-                                                }
-                                            }
-                                            else {
-                                                message.reply("I need a discord webhook url!");
-                                                return;
-                                            }
-
-                                            var mes = message;
-                                            try {
-                                                message.delete();
-                                            }
-                                            catch (err) {
-                                                message.reply("I couldn't delete your message. Please remove it yourself.\n Error: " + err.message);
-                                            }
-
-                                            message.reply("I will send messages in private, execute commands here.");
-
-                                            mes.author.send("Give me a moment. I am setting up the redirect for " + parameters[0]);
-
-                                            var link = await webserver.setuplink(new Webhook("NEWWEBHOOK", parameters[0], new Server(message.guild.id)));
-                                            if (link != undefined) {
-                                                var tick = await repo.CreateWebhook(mes.guild.id, parameters[0]);
-
-                                                if (tick != "Couldn't create record!") {
-                                                    mes.author.send("Finished and completed setup. You can use this webhook: " + link);
-                                                    SendToAdmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
-                                                }
-                                                else {
-                                                    message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
-                                                }
-                                                mes.reply("Completed, have fun using it!");
-                                            }
-                                            else {
-                                                message.author.send("An error occurred setting up your webhook");
-                                            }
-
-                                        }
-                                        else {
-                                            message.reply(notallowed("link", message.guild.id));
-                                        }
-                                    }
-                                    catch (err) {
-                                        print(err.message);
-                                        message.reply("An error occured while setting this up for you. Please try again. \n Error: " + err.message);
-                                    }
+                                    webhookcommands.createlink(client, message, parameters, webserver, roleid);
                                 }
                                 else if (command === "links") {
                                     if (await PermCheck(message, message.author, roleid) == true) {
@@ -239,7 +192,7 @@ function initialize_main() {
                                     configcommands.setbotcontrol(message, parameters);
                                 }
                                 else if ((command === "userinfo") || (command === "me")) {
-                                    infocommands.userinfo(client, message, parameters);
+                                   infocommands.userinfo(client, message, parameters);
                                 }
                                 else {
                                     GuildSpecificCommands(message);
@@ -313,7 +266,7 @@ async function Start_Bot() {
     print("Bot has started", true);
     initialize_main();
 
-    //  Start_Webserver();
+      Start_Webserver();
 
 }
 
