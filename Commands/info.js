@@ -127,7 +127,6 @@ module.exports = {
     },
 
     serverinfo: async function (client, message) {
-        // print(message.guild.roles);
         var roleoutput = ``;
         message.guild.roles.forEach(function (element) {
             roleoutput = `${roleoutput}, ${element.name}`;
@@ -157,7 +156,11 @@ module.exports = {
         data.addField(`Roles`, roleoutput, false);
 
         var prefix = await repo.GetPrefix(message.guild.id);
-        var settings = `**Prefix:** ${prefix}`;
+        var webhooks = (await repo.GetWebhooksFromServer(message.guild.id)).length;
+        var botcontrol = await repo.GetValue(message.guild.id, "PermRole");
+        var settings = `**Prefix:** ${prefix} \n` +
+            `**Webhooks**: ${webhooks} \n` +
+            `**BotControl:** <@&${botcontrol}>`;
         data.addField(`Server specific bot configuration`, settings, false);
 
 
