@@ -1,10 +1,24 @@
-﻿const express = require('express');
+﻿'use strict';
+
+const express = require('express');
 const request = require('request');
 let app = express();
 app.use(express.json());
+
 const bodyParser = require('body-parser');
 
-'use strict';
+function SendError(webhook, error) {
+    var data = [];
+    data.title = `Error occured for: ${webhook.server.id}`;
+    data.description = `One of your webhook calls had an error occur.`;
+    data.timestamp = `Occured at: ${new Date()}`;
+    data = new Discord.RichEmbed(data);
+
+    data.addField(`ID`, webhook.id, true);
+    data.addField(`URL`, webhook.url, true);
+
+    webhook.server.owner.send(data);
+}
 
 module.exports = class Webserver {
     constructor(servername, port, legacyservername) {
@@ -37,7 +51,7 @@ module.exports = class Webserver {
                 }
 
                 if (req.body.username == undefined || req.body.content == undefined || req.body.content == "" || req.body.username == "") {
-                    webhook.server.user.send("Warning, a message send by one of your webhooks is causing issues. \n ");
+                    SendError(webhook, err);
                 }
                 return res.send("Successfully posted data to webhook.");
             });
