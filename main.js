@@ -127,20 +127,8 @@ function initialize_main() {
                                 else if (command === "link") {
                                     webhookcommands.createlink(client, message, parameters, webserver, roleid);
                                 }
-                                else if (command === "links") {
-                                    if (await PermCheck(message, message.author, roleid) == true) {
-                                        message.reply("I will send messages in private, execute commands here.");
-                                        var links = await repo.GetWebhooksFromServer(message.guild.id);
-                                        message.author.send("All redirects for " + message.guild.name + ":");
-                                        for (var i = 0; i < links.length; i++) {
-                                            var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + config.info.link + ":3000/")
-
-                                            message.author.send(links[i].webhook + "\nto\n" + inbound);
-                                        }
-                                    }
-                                    else {
-                                        message.reply(notallowed("links", message.guild.id))
-                                    }
+                                else if (command === "links" || command === "webhooks") {
+                                    webhookcommands.getalllinks(client, message, roleid);
                                 }
                                 else if (command === "prefix") {
                                     configcommands.setprefix(client, message, parameters);
@@ -231,8 +219,8 @@ function GuildSpecificCommands(message) {
 
 function notallowed(command, id) {
     return "You are not allowed to use the " + prefix + command + " command."
-
 }
+
 function PermCheck(message, user, roleid) {
     var val = false;
     return new Promise(function (resolve, reject) {
