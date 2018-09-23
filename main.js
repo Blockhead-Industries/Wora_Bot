@@ -235,7 +235,7 @@ function initialize_main() {
                                 message.reply(messagearray);
                             }
                             else if (input === prefix + "botcontrol") {
-                                configcommands.setbotcontrol(message);
+                                configcommands.setbotcontrol(message, parameters);
                             }
                             else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
                                 infocommands.userinfo(client, message, parameters);
