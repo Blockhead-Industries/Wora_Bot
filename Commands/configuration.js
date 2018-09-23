@@ -42,8 +42,8 @@ module.exports = {
         }
     },
 
-    setbotcontrol: async function (message) {
         if (message.member.hasPermission("ADMINISTRATOR")) {
+    setbotcontrol: async function (message, parameters) {
             if (parameters[0] != ("" || undefined)) {
                 bigpara = "";
                 for (var i = 0; i < parameters.length; i++) {
