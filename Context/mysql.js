@@ -51,26 +51,30 @@ function GetServerByID(id, client) {
 
 async function PutTogether_Webhook(item, client) {
     return new Promise(async function (resolve, reject) {
+        try {
+            var server = await GetServerByID(item.serverid, client);
 
-        print("EYYYYYYYYYYYYYYYYYYYYYY" + item.serverid,true);
-        var server = await GetServerByID(item.serverid, client);
+            var webhook = new Webhook(item.id, item.webhook, server);
 
-        var webhook = new Webhook(item.id, item.webhook, server);
+            if (webhook.server === undefined) {
+                print("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
+                var deleteresult = await module.exports.DeleteWebhooksOnServer(item.serverid);
 
-        if (webhook.server === undefined) {
-            print("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
-            var deleteresult = await module.exports.DeleteWebhooksOnServer(item.serverid);
-
-            if (deleteresult) {
-                print("Removed webhooks on server ID: " + item.serverid);
+                if (deleteresult) {
+                    print("Removed webhooks on server ID: " + item.serverid);
+                }
+                else {
+                    print("Failed at removing all webhooks from server ID " + item.serverid);
+                }
+                resolve(undefined);
             }
             else {
-                print("Failed at removing all webhooks from server ID " + item.serverid);
+                resolve(webhook);
             }
-            resolve(undefined);
         }
-        else {
-            resolve(webhook);
+        catch (error) {
+            print(error.message);
+            resolve(undefined);
         }
     });
 }

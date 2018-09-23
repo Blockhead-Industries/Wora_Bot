@@ -38,11 +38,23 @@ function SendNotification(title, desc, info) {
     data = new Discord.RichEmbed(data);
 
     data.addField(`Guild: `, info.guild, false);
-    data.addField(`Owner: `, info.owner, false);
+    data.addField(`Owner: `, `${info.owner.tag} - <@${info.owner.id}> - ${info.owner.id}`, false);
     data.addField("Webhook: ", info.webhook.url, false);
     SendToAdmin(data);
 }
 
+function UnauthorizedRequest(message) {
+    var data = [];
+    data.title = title;
+    data.description = desc;
+    data.timestamp = `Occured at: ${new Date()}`;
+    data = new Discord.RichEmbed(data);
+
+    data.addField(`Guild: `, message.guild.name, false);
+    data.addField(`Request from: `, `${message.author.tag} - <@${message.author.id}> - ${message.author.id}`, false);
+    data.addField("The request: ", `${message.content}`, false);
+    SendToAdmin(data);
+}
 
 module.exports = {
     init: function (s, c, p, sta) {
@@ -68,15 +80,30 @@ module.exports = {
                     message.author.send("Looking for webhook...");
                     try {
                         var webhook = await repo.GetWebhookByUrl(parameters[0]);
-                        if (webhook !== undefined) {
+                        if (webhook !== undefined && message.guild.id !== webhook.server.id) {
                             message.author.send(`Found the webhook. It has been registered under ID: ${webhook.id}. \n It will now be deleted`);
                             var k = await repo.DeleteWebhook(webhook.id);
-                            if (k) {
-                                message.author.send(`Webhook has succesfully been deleted.`);
+                            if (k != undefined) {
+                                var data = [];
+
+                                data.title =`Deleted webhook for ${message.guild.name}`;
+                                data.description = `On your request a webhook has been deleted.`;
+                                data.timestamp = `Requested at: ${new Date()}`;
+                                data = new Discord.RichEmbed(data);
+                                data.addField(`Webhook - ID: ${webhook.id}`, `${webhook.url}`, true);
+
+                                message.author.send(data);
                             }
                             else {
-                                message.author.send("Something went wrong deleting your webhook. Please try again. If the problem persists please contact one of the bot owners.");
+                                message.author.send("The webhook request for deletion doesn't exist. If this is incorrect and the problem persists please contact one of the bot owners.");
                             }
+                        }
+                        else if (message.guild.id !== webhook.server.id) {
+                            message.reply("This webhook doesn't belong to this server. You are not allowed to delete it. The admins have been notified.");
+                            UnauthorizedRequest(message.author, message.content);
+                        }
+                        else {
+                            message.author.send("The webhook request for deletion doesn't exist. If this is incorrect and the problem persists please contact one of the bot owners.");
                         }
                     }
                     catch(error){
