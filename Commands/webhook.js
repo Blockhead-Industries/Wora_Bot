@@ -110,7 +110,6 @@ module.exports = {
                     return;
                 }
 
-                var mes = message;
                 try {
                     message.delete();
                 }
@@ -120,14 +119,14 @@ module.exports = {
 
                 message.reply("I will send messages in private, execute commands here.");
 
-                mes.author.send("Give me a moment. I am setting up the redirect for " + parameters[0]);
+                message.author.send("Give me a moment. I am setting up the redirect for " + parameters[0]);
                 var webhook = new Webhook("NEWWEBHOOK", parameters[0], new Server(message.guild.id));
                 var link = await webserver.setuplink(webhook);
                 if (link != undefined) {
-                    var tick = await repo.CreateWebhook(mes.guild.id, parameters[0]);
+                    var tick = await repo.CreateWebhook(message.guild.id, parameters[0]);
 
                     if (tick != "Couldn't create record!") {
-                        mes.author.send("Finished and completed setup. You can use this webhook: " + link);
+                        message.author.send("Finished and completed setup. You can use this webhook: " + link);
                         var info=[];
                         info.guild = `${message.guild.name} (${message.guild.id})`;
                         info.owner = `${message.author.tag} (${message.author.id})`;
@@ -137,7 +136,7 @@ module.exports = {
                     else {
                         message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.");
                     }
-                    mes.reply("Completed, have fun using it!");
+                    message.reply("Completed, have fun using it!");
                 }
                 else {
                     message.author.send("An error occurred setting up your webhook");
