@@ -110,138 +110,140 @@ function initialize_main() {
 
                             var prefix = await repo.GetPrefix(message.guild.id);
                             var roleid = await repo.GetValue(message.guild.id, "PermRole");
-
-                            if (input === prefix + "ping") {
-                                infocommands.ping(client, message);
-                            }
-                            else if (input === prefix + "you") {
-                                infocommands.botinfo(client, message);
-                            }
-                            else if (input === prefix + "deletelink") {
-                                webhookcommands.deletelink(client, message);
-                            }
-                            else if (input === prefix + "link") {
-                                try {
-                                    if (await PermCheck(message, message.author, roleid) == true) {
-                                        if (parameters.length != 0) {
-                                            if (!parameters[0].includes(config.costum.discordwebhookurl)) {
-                                                message.reply("That is not a valid url!");
-                                                return;
-                                            }
-                                        }
-                                        else {
-                                            message.reply("I need a discord webhook url!");
-                                            return;
-                                        }
-
-                                        var mes = message;
-                                        try {
-                                            message.delete();
-                                        }
-                                        catch (err) {
-                                            message.reply("I couldn't delete your message. Please remove it yourself.\n Error: " + err.message);
-                                        }
-
-                                        message.reply("I will send messages in private, execute commands here.");
-
-                                        mes.author.send("Give me a moment. I am setting up the redirect for " + parameters[0]);
-
-                                        var link = await webserver.setuplink(new Webhook("NEWWEBHOOK", parameters[0], new Server(message.guild.id)));
-                                        if (link != undefined) {
-                                            var tick = await repo.CreateWebhook(mes.guild.id, parameters[0]);
-
-                                            if (tick != "Couldn't create record!") {
-                                                mes.author.send("Finished and completed setup. You can use this webhook: " + link);
-                                                SendToAdmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
+                            if (input.charAt(0) == prefix) {
+                                var command = input.substr(1);
+                                if (command === prefix + "ping") {
+                                    infocommands.ping(client, message);
+                                }
+                                else if (command === "you") {
+                                    infocommands.botinfo(client, message);
+                                }
+                                else if (command === "deletelink") {
+                                    webhookcommands.deletelink(client, message);
+                                }
+                                else if (command === "link") {
+                                    try {
+                                        if (await PermCheck(message, message.author, roleid) == true) {
+                                            if (parameters.length != 0) {
+                                                if (!parameters[0].includes(config.costum.discordwebhookurl)) {
+                                                    message.reply("That is not a valid url!");
+                                                    return;
+                                                }
                                             }
                                             else {
-                                                message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
+                                                message.reply("I need a discord webhook url!");
+                                                return;
                                             }
-                                            mes.reply("Completed, have fun using it!");
+
+                                            var mes = message;
+                                            try {
+                                                message.delete();
+                                            }
+                                            catch (err) {
+                                                message.reply("I couldn't delete your message. Please remove it yourself.\n Error: " + err.message);
+                                            }
+
+                                            message.reply("I will send messages in private, execute commands here.");
+
+                                            mes.author.send("Give me a moment. I am setting up the redirect for " + parameters[0]);
+
+                                            var link = await webserver.setuplink(new Webhook("NEWWEBHOOK", parameters[0], new Server(message.guild.id)));
+                                            if (link != undefined) {
+                                                var tick = await repo.CreateWebhook(mes.guild.id, parameters[0]);
+
+                                                if (tick != "Couldn't create record!") {
+                                                    mes.author.send("Finished and completed setup. You can use this webhook: " + link);
+                                                    SendToAdmin("A webhook has been created in the following guild: " + message.guild.name + " by " + message.author.tag);
+                                                }
+                                                else {
+                                                    message.author.send("An error occured. Sorry! Please try again otherwise contact the bot owner.")
+                                                }
+                                                mes.reply("Completed, have fun using it!");
+                                            }
+                                            else {
+                                                message.author.send("An error occurred setting up your webhook");
+                                            }
+
                                         }
                                         else {
-                                            message.author.send("An error occurred setting up your webhook");
+                                            message.reply(notallowed("link", message.guild.id));
                                         }
+                                    }
+                                    catch (err) {
+                                        print(err.message);
+                                        message.reply("An error occured while setting this up for you. Please try again. \n Error: " + err.message);
+                                    }
+                                }
+                                else if (command === "links") {
+                                    if (await PermCheck(message, message.author, roleid) == true) {
+                                        message.reply("I will send messages in private, execute commands here.");
+                                        var links = await repo.GetWebhooksFromServer(message.guild.id);
+                                        message.author.send("All redirects for " + message.guild.name + ":");
+                                        for (var i = 0; i < links.length; i++) {
+                                            var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + config.info.link + ":3000/")
 
+                                            message.author.send(links[i].webhook + "\nto\n" + inbound);
+                                        }
                                     }
                                     else {
-                                        message.reply(notallowed("link", message.guild.id));
+                                        message.reply(notallowed("links", message.guild.id))
                                     }
                                 }
-                                catch (err) {
-                                    print(err.message);
-                                    message.reply("An error occured while setting this up for you. Please try again. \n Error: " + err.message);
+                                else if (command === "prefix") {
+                                    configcommands.setprefix(client, message, parameters);
                                 }
-                            }
-                            else if (input === prefix + "links") {
-                                if (await PermCheck(message, message.author, roleid) == true) {
-                                    message.reply("I will send messages in private, execute commands here.");
-                                    var links = await repo.GetWebhooksFromServer(message.guild.id);
-                                    message.author.send("All redirects for " + message.guild.name + ":");
-                                    for (var i = 0; i < links.length; i++) {
-                                        var inbound = links[i].webhook.replace("https://discordapp.com/api/webhooks/", "http://" + config.info.link + ":3000/")
-
-                                        message.author.send(links[i].webhook + "\nto\n" + inbound);
+                                else if (command === "serverinfo") {
+                                    infocommands.serverinfo(client, message);
+                                }
+                                else if (command === "help") {
+                                    helparray = "";
+                                    var list = 0;
+                                    for (i = 0; i < commands.length / 2; i++) {
+                                        helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
+                                        list += 2;
                                     }
+                                    messagearray = {
+                                        embed: {
+                                            color: 3066993,
+                                            author: {
+                                                name: "Commands for " + message.guild.name,
+                                                icon_url: message.guild.iconURL
+                                            },
+                                            fields: [
+                                                {
+                                                    name: "Help",
+                                                    value: helparray
+                                                }
+                                            ],
+                                            timestamp: new Date(),
+                                            footer: {
+                                                icon_url: client.user.avatarURL,
+                                                text: config.info.link
+                                            }
+                                        }
+                                    };
+                                    //var list = 0
+                                    //for (i = 0; i < commands.length / 2; i++) {
+                                    //    messagearray.embed.fields.push(
+                                    //        {
+                                    //            name: prefix + commands[list],
+                                    //            // inline: true,
+                                    //            value: commands[list + 1]
+                                    //        }
+                                    //    )
+                                    //    list += 2;
+                                    //}
+                                    message.reply(messagearray);
+                                }
+                                else if (command === "botcontrol") {
+                                    configcommands.setbotcontrol(message, parameters);
+                                }
+                                else if ((command === "userinfo") || (command === "me")) {
+                                    infocommands.userinfo(client, message, parameters);
                                 }
                                 else {
-                                    message.reply(notallowed("links", message.guild.id))
+                                    GuildSpecificCommands(message);
                                 }
-                            }
-                            else if (input === prefix + "prefix") {
-                                configcommands.setprefix(client, message, parameters);
-                            }
-                            else if (input === prefix + "serverinfo") {
-                                infocommands.serverinfo(client, message);
-                            }
-                            else if (input === prefix + "help") {
-                                helparray = "";
-                                var list = 0;
-                                for (i = 0; i < commands.length / 2; i++) {
-                                    helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
-                                    list += 2;
-                                }
-                                messagearray = {
-                                    embed: {
-                                        color: 3066993,
-                                        author: {
-                                            name: "Commands for " + message.guild.name,
-                                            icon_url: message.guild.iconURL
-                                        },
-                                        fields: [
-                                            {
-                                                name: "Help",
-                                                value: helparray
-                                            }
-                                        ],
-                                        timestamp: new Date(),
-                                        footer: {
-                                            icon_url: client.user.avatarURL,
-                                            text: config.info.link
-                                        }
-                                    }
-                                };
-                                //var list = 0
-                                //for (i = 0; i < commands.length / 2; i++) {
-                                //    messagearray.embed.fields.push(
-                                //        {
-                                //            name: prefix + commands[list],
-                                //            // inline: true,
-                                //            value: commands[list + 1]
-                                //        }
-                                //    )
-                                //    list += 2;
-                                //}
-                                message.reply(messagearray);
-                            }
-                            else if (input === prefix + "botcontrol") {
-                                configcommands.setbotcontrol(message, parameters);
-                            }
-                            else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
-                                infocommands.userinfo(client, message, parameters);
-                            }
-                            else {
-                                GuildSpecificCommands(message);
                             }
                         }
                     }
