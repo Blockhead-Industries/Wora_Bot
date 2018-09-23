@@ -52,13 +52,14 @@ function GetServerByID(id, client) {
 async function PutTogether_Webhook(item, client) {
     return new Promise(async function (resolve, reject) {
 
+        print("EYYYYYYYYYYYYYYYYYYYYYY" + item.serverid,true);
         var server = await GetServerByID(item.serverid, client);
 
         var webhook = new Webhook(item.id, item.webhook, server);
 
-        if (webhook.server == undefined) {
+        if (webhook.server === undefined) {
             print("Error, server with ID: " + item.serverid + " doesn't exist anymore. Webhook with ID: " + webhook.id + " wont be setup.");
-            var deleteresult = await DeleteWebhooksOnServer(item.serverid);
+            var deleteresult = await module.exports.DeleteWebhooksOnServer(item.serverid);
 
             if (deleteresult) {
                 print("Removed webhooks on server ID: " + item.serverid);
@@ -159,6 +160,22 @@ module.exports = {
         });
     },
 
+    GetWebhookByUrl: async function (url) {
+        return new Promise(function (resolve, reject) {
+            connection.query("SELECT * FROM webhooks WHERE webhook like '"+url+"';", async function ExistCheck(err, result) {
+                if (err) {
+                    print(err);
+                    resolve(undefined);
+                }
+                console.log(url);
+                if (result !== undefined) {
+                    var webhook = await PutTogether_Webhook(result[0]);
+                    resolve(webhook);
+                }
+                resolve(undefined);
+            });
+        });
+    },
 
     DeleteWebhook: async function (id) {
         var returned;
@@ -166,9 +183,9 @@ module.exports = {
             connection.query("DELETE FROM webhooks WHERE id=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
                     print(err);
-                    resolve("Couldn't delete record!");
+                    resolve(false);
                 }
-                resolve("Successfully deleted");
+                resolve(true);
             });
         });
     },

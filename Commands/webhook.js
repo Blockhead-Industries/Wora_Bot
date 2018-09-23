@@ -67,7 +67,7 @@ module.exports = {
 
                     message.author.send("Looking for webhook...");
                     try {
-                        var webhook = await repo.GetWebhook(parameters[0]);
+                        var webhook = await repo.GetWebhookByUrl(parameters[0]);
                         if (webhook !== undefined) {
                             message.author.send(`Found the webhook. It has been registered under ID: ${webhook.id}. \n It will now be deleted`);
                             var k = await repo.DeleteWebhook(webhook.id);

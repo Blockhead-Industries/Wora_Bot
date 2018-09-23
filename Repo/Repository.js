@@ -49,5 +49,8 @@ module.exports = {
     GetAllWebhooks: async function (client) {
         return await db.GetAllWebhooks(client);
     },
+
+    GetWebhookByUrl: async function (url) {
+        return await db.GetWebhookByUrl(url);
     }
 }
