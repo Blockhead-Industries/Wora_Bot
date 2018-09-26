@@ -4,6 +4,6 @@ const db = require("../Context/" + config.sql.type + ".js");
 
 module.exports = {
     GetAllOwners: async function () {
-        return await db.GetData();
+        return await db.GetAllOwners();
     },
 }
