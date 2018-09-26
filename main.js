@@ -95,8 +95,24 @@ function initialize_main() {
                 if (message.guild.available) {
                     const user = message.author;
 
-                    var out = await repo.GetWebhooksFromServer(await message.guild.id);
-                    if (out == null) {//id,servername,members,prefix,owner
+                    var out = await repo.GetServer(await message.guild.id);
+
+
+
+
+
+
+                    //Create a GETSERVER
+
+
+
+
+
+
+
+
+
+                    if (out === undefined) {//id,servername,members,prefix,owner
                         print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region), true);
                     }
                     else {
@@ -112,8 +128,8 @@ function initialize_main() {
 
                             var prefix = await repo.GetPrefix(message.guild.id);
                             var roleid = await repo.GetValue(message.guild.id, "PermRole");
-
-                            if (input.charAt(0) == prefix) {
+                            print("prefix -"+prefix+"-", true);
+                            if (input.charAt(0) === prefix) {
                                 var command = input.substr(1);
                                 if (command === prefix + "ping") {
                                     infocommands.ping(client, message);
