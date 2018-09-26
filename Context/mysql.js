@@ -4,7 +4,7 @@
 var async = require("async");
 var mysql = require('mysql');
 
-const config = require("../settings/config.json");
+const config = require("../Settings/config.json");
 
 var connection = mysql.createConnection({
     host: config.sql.host,
