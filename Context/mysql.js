@@ -1,5 +1,5 @@
-﻿const Webhook = require('../Classes/Webhook.js');
-const Server = require('../Classes/Server.js');
+﻿//const Webhook = require('../Classes/Webhook.js');
+//const Server = require('../Classes/Server.js');
 
 var async = require("async");
 var mysql = require('mysql');
